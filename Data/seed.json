@@ -1,0 +1,47 @@
+{
+  "hotels": [
+    {
+      "id": 1,
+      "name": "Hilton Almaty",
+      "city": "Almaty",
+      "price": 25000,
+      "rating": 4.8,
+      "rooms": 120,
+      "available": true
+    },
+    {
+      "id": 2,
+      "name": "Rixos Astana",
+      "city": "Astana",
+      "price": 40000,
+      "rating": 4.9,
+      "rooms": 90,
+      "available": true
+    },
+    {
+      "id": 3,
+      "name": "Aksunkar Hotel",
+      "city": "Shymkent",
+      "price": 15000,
+      "rating": 4.2,
+      "rooms": 60,
+      "available": true
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "email": "admin@hotel.com",
+      "password": "admin123"
+    },
+    {
+      "id": 2,
+      "username": "nuriman",
+      "email": "nuriman@example.com",
+      "password": "1234"
+    }
+  ],
+  "bookings": [
+  ]
+}

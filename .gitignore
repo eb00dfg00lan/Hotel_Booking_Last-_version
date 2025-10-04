@@ -1,0 +1,9 @@
+# .gitignore
+__pycache__/
+*.pyc
+*.db
+.env
+.vscode/
+.idea/
+.streamlit/
+.venv
