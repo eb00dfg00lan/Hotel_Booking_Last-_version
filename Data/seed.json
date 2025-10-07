@@ -28,20 +28,7 @@
       "available": true
     }
   ],
-  "users": [
-    {
-      "id": 1,
-      "username": "admin",
-      "email": "admin@hotel.com",
-      "password": "admin123"
-    },
-    {
-      "id": 2,
-      "username": "nuriman",
-      "email": "nuriman@example.com",
-      "password": "1234"
-    }
-  ],
+  
   "bookings": [
   ]
 }

@@ -23,3 +23,5 @@ def combine_filters(*preds: Callable[[Hotel], bool]) -> Callable[[Hotel], bool]:
 
 def filter_hotels(hotels: Iterable[Hotel], predicate: Callable[[Hotel], bool]) -> List[Hotel]:
     return list(filter(predicate, hotels))
+
+def
