@@ -1,4 +1,6 @@
 import streamlit as st
+import re
+import hashlib
 from datetime import datetime, date
 from tools.db import init_db, seed_database, fetch_hotels, insert_booking, fetch_user_by_email, get_connection
 from core.domain import Hotel, User, Booking
@@ -79,10 +81,17 @@ st.markdown("<br><br><br>", unsafe_allow_html=True)
 # --- Контент страниц ---
 page = st.session_state.page
 
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def is_valid_email(email):
+    return re.match(r"[^@]+@[^@]+\.[^@]+", email)
 # --- Главная ---
 if page == "welcome":
     st.title("🏨 Hotel Booking System")
     st.write("Добро пожаловать! Используйте меню сверху.")
+
+
 
 # --- Регистрация ---
 elif page == "register":
@@ -91,18 +100,20 @@ elif page == "register":
     email = st.text_input("Email", key="reg_email")
     password = st.text_input("Пароль", type="password", key="reg_pass")
     if st.button("Зарегистрироваться"):
-        if username and email and password:
+        if not (username and email and password):
+            st.error("Заполните все поля.")
+        elif not is_valid_email(email):
+            st.error("Некорректный email.")
+        else:
             with get_connection() as conn:
                 cur = conn.cursor()
                 try:
                     cur.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
-                                (username, email, password))
+                                (username, email, hash_password(password)))
                     conn.commit()
                     st.success("Аккаунт создан. Теперь войдите.")
-                except:
-                    st.error("Ошибка регистрации: возможно, email уже занят.")
-        else:
-            st.error("Заполните все поля.")
+                except Exception as e:
+                    st.error(f"Ошибка регистрации: возможно, email уже занят. {e}")
 
 # --- Вход ---
 elif page == "login":
@@ -112,9 +123,9 @@ elif page == "login":
     if st.button("Войти"):
         with get_connection() as conn:
             cur = conn.cursor()
-            cur.execute("SELECT id, username, email FROM users WHERE email=? AND password=?", (email, password))
+            cur.execute("SELECT id, username, email, password FROM users WHERE email=?", (email,))
             user = cur.fetchone()
-            if user:
+            if user and hash_password(password) == user[3]:
                 st.session_state.user = {"id": user[0], "username": user[1], "email": user[2]}
                 st.success(f"Добро пожаловать, {user[1]}!")
                 set_page("search")
@@ -139,6 +150,10 @@ elif page == "search":
     hotels = [Hotel(id=r[0], name=r[1], city=r[2], price=r[3], rating=r[4], rooms=r[5], available=bool(r[6])) for r in hotels_rows]
     filtered = list(filter(combined, hotels))
 
+    # Track selected hotel for booking
+    if "selected_hotel_id" not in st.session_state:
+        st.session_state.selected_hotel_id = None
+
     if filtered:
         for h in filtered:
             st.markdown(f"### {h.name} — {h.city}")
@@ -147,15 +162,19 @@ elif page == "search":
                 if not st.session_state.user:
                     st.error("Сначала войдите в систему.")
                 else:
-                    check_in = st.date_input("Дата заезда", min_value=date.today(), key=f"ci_{h.id}")
-                    check_out = st.date_input("Дата выезда", min_value=check_in, key=f"co_{h.id}")
-                    guests = st.number_input("Гостей", 1, 10, key=f"gu_{h.id}")
-                    if st.button("Подтвердить бронирование", key=f"confirm_{h.id}"):
-                        insert_booking(st.session_state.user["id"], h.id, check_in.isoformat(), check_out.isoformat(), guests)
-                        st.success("Бронирование успешно создано.")
+                    st.session_state.selected_hotel_id = h.id
+
+            # Show booking form only for selected hotel
+            if st.session_state.selected_hotel_id == h.id and st.session_state.user:
+                check_in = st.date_input("Дата заезда", min_value=date.today(), key=f"ci_{h.id}")
+                check_out = st.date_input("Дата выезда", min_value=check_in, key=f"co_{h.id}")
+                guests = st.number_input("Гостей", 1, 10, key=f"gu_{h.id}")
+                if st.button("Подтвердить бронирование", key=f"confirm_{h.id}"):
+                    insert_booking(st.session_state.user["id"], h.id, check_in.isoformat(), check_out.isoformat(), guests)
+                    st.success("Бронирование успешно создано.")
+                    st.session_state.selected_hotel_id = None  # Reset after booking
     else:
         st.info("Нет отелей по заданным критериям.")
-
 # --- Мои бронирования ---
 elif page == "bookings":
     st.title("📚 Мои бронирования")
