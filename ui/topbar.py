@@ -19,4 +19,4 @@ def render_topbar(goto):
             st.session_state.selected_hotel_id = None
             goto("welcome")
     st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
+    # не нужно больше <br><br><br> — отступ делает CSS (.block-container padding-top)

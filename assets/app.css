@@ -1,0 +1,41 @@
+/* ===== Hide Streamlit chrome (Deploy, toolbar, header, decorations) ===== */
+div[data-testid="stDeployButton"] { display: none !important; }
+div[data-testid="stToolbar"] { display: none !important; }
+header { visibility: hidden; height: 0 !important; }
+div[data-testid="stDecoration"] { display: none !important; }
+
+/* ===== Top navbar (ваш фиксированный хедер) ===== */
+:root { --topbar-height: 60px; }
+
+.top-navbar{
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+  padding: 10px 25px;
+  z-index: 9999;
+}
+
+.top-navbar button{
+  border: none;
+  background: #f0f2f6;
+  border-radius: 8px;
+  padding: 6px 15px;
+  margin-left: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .2s ease;
+}
+
+.top-navbar button:hover{ background: #e0e0e0; }
+
+/* Отодвинем контент вниз, чтобы не прятался под фикс-баром */
+.block-container{ padding-top: calc(var(--topbar-height) + 16px) !important; }
+
+/* Небольшая адаптация для узких экранов */
+@media (max-width: 768px){
+  :root { --topbar-height: 72px; }
+  .top-navbar{ padding: 8px 12px; }
+  .top-navbar button{ margin-left: 6px; padding: 6px 10px; }
+  .block-container{ padding-top: calc(var(--topbar-height) + 12px) !important; }
+}

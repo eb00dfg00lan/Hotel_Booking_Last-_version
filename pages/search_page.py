@@ -1,6 +1,7 @@
+# pages/search_page.py
 import streamlit as st
-from datetime import date, timedelta
 from tools.db import fetch_hotels
+from core.filtres import make_city_filter, make_price_range_filter, make_stars_filter, filter_hotels
 
 def render(goto):
     st.title("🔍 Поиск отелей")
@@ -22,22 +23,22 @@ def render(goto):
          "rating": float(r[4]), "rooms": int(r[5]), "available": bool(r[6])}
         for r in rows
     ]
-    def match_city(x):  return True if city == "Все" else (x["city"] == city)
-    def match_price(x): return x["price"] <= max_price
-    def match_stars(x):
-        stars = max(1, min(5, int(round(x["rating"]))))
-        return stars >= min_stars
 
-    filtered = [x for x in items if match_city(x) and match_price(x) and match_stars(x)]
+    preds = [
+        make_city_filter(city),
+        make_price_range_filter(0, max_price),
+        make_stars_filter(min_stars),
+    ]
+    filtered = filter_hotels(items, preds)
 
     if not filtered:
         st.info("Нет отелей по заданным критериям.")
         return
 
     for h in filtered:
+        stars = max(1, min(5, int(round(h["rating"]))))
         st.markdown(f"### {h['name']} — {h['city']}")
-        stars = max(1, min(5, int(round(h['rating']))))
-        st.write(f"Цена: {h['price']} ₸ | ⭐ {stars} | Рейтинг: {h['rating']:.1f} | Номеров: {h['rooms']}")
+        st.write(f"Цена за ночь: {h['price']} ₸ | ⭐ {stars} | Рейтинг: {h['rating']:.1f} | Номеров: {h['rooms']}")
         if st.button(f"Забронировать {h['name']}", key=f"book_{h['id']}"):
             if not st.session_state.get("user"):
                 st.error("Сначала войдите в систему.")
