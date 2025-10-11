@@ -15,12 +15,17 @@ def render(goto):
         if st.button("Войти"):
             with get_connection() as conn:
                 cur = conn.cursor()
-                cur.execute("SELECT id, username, email, password FROM users WHERE email=?", (email,))
+                cur.execute("SELECT id, username, email, password, role FROM users WHERE email=?", (email.strip().lower(),))
                 user = cur.fetchone()
                 if user and _hash_password(password) == user[3]:
-                    st.session_state.user = {"id": user[0], "username": user[1], "email": user[2]}
-                    st.success(f"Добро пожаловать, {user[1]}!")
-                    goto("search")
+                    st.session_state.user = {"id": user[0], "username": user[1], "email": user[2], "role": user[4]}
+                    st.success(f"Добро пожаловать, {user[1]}({user[4]})!") 
+                    if user[4] == "admin":
+                        goto("admin")
+                    elif user[4] == "partner":
+                        goto("partner")
+                    else:
+                        goto("guest")
                 else:
                     st.error("Неверные данные.")
     with c2:

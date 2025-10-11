@@ -1,45 +1,99 @@
 import streamlit as st
 from tools.db import init_db, seed_database
-from ui.topbar import render_topbar
-from pages import search_page, booking_page, login_page, register_page, bookings_page, admin_page, welcome_page
+from ui import topbar
+from pages import (
+    guest_page, booking_page, login_page, register_page, bookings_page,
+    partner_dashbord, admin_page, welcome_page, search_page
+)
 from pathlib import Path
+from core.guards import require_roles
 
+# --- utils ---
 def load_css(path="assets/app.css"):
     css = Path(path).read_text(encoding="utf-8")
     st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
-# ...
+# --- app setup ---
 st.set_page_config(page_title="Hotel Booking System", page_icon="🏨", layout="wide")
-load_css()  # <-- добавить эту строку
-
-# --- init ---
-init_db()
-seed_database()
+load_css()
+init_db(); seed_database()
 
 # --- session defaults ---
-if "page" not in st.session_state:
-    st.session_state.page = "welcome"  # <- страница по умолчанию (строка!)
-if "user" not in st.session_state:
-    st.session_state.user = None
-if "selected_hotel_id" not in st.session_state:
-    st.session_state.selected_hotel_id = None
+ss = st.session_state
+if "page" not in ss: ss.page = "welcome"
+if "user" not in ss: ss.user = None           # <-- FIX: было ss.usern
+if "selected_hotel_id" not in ss: ss.selected_hotel_id = None
+if "role" not in ss: ss.role = "guest"
+
+# ... твои импорты/инициализация выше
 
 def goto(p: str):
-    st.session_state.page = p
+    ss.page = p
     st.rerun()
 
-# --- top bar всегда показываем сверху ---
+# единый layout с топбаром
+def render_with_topbar(body_fn):
+    left, right = st.columns([0.8, 0.2])
+    with left:
+        topbar.render_header(goto)   # левый: логотип/меню/поиск и т.п.
+        body_fn(goto)                # тут рисуем саму страницу
+    with right:
+        topbar.render_auth(goto)     # правый: вход/аккаунт
 
-# --- router ---
-page_map = {
-    "search":   lambda: search_page.render(goto),
-    "Booking":  lambda: booking_page.render(goto),
-    "login":    lambda: login_page.render(goto),
-    "register": lambda: register_page.render(goto),
-    "bookings": lambda: bookings_page.render(goto),
-    "admin":    lambda: admin_page.render(goto),
-    "welcome":  lambda: welcome_page.render(goto),  # опц. пустая домашняя
+# --- guarded wrappers ---
+def partner_guarded(goto):
+    require_roles("partner", "admin")
+    partner_dashbord.render(goto)
+
+def admin_guarded(goto):
+    require_roles("admin")
+    admin_page.render(goto)
+
+# --- РАННИЕ ВЫХОДЫ: теперь с топбаром ---
+if ss.page == "login":
+    render_with_topbar(login_page.render); st.stop()
+
+if ss.page == "register":
+    render_with_topbar(register_page.render); st.stop()
+
+if ss.page == "welcome":
+    welcome_page.render(goto); st.stop()
+
+if ss.page == "search":
+    render_with_topbar(search_page.render); st.stop()
+
+if ss.page == "Booking":
+    render_with_topbar(booking_page.render); st.stop()
+
+# --- ТАБОВЫЙ РЕЖИМ (как было, топбар уже есть) ---
+role = topbar.get_current_role() or ss.get("role", "guest")
+
+tabs_by_role = {
+    "admin": [
+        ("Брони",     bookings_page.render),
+        ("Партнёры",  partner_guarded),
+        ("Админ",     admin_guarded),
+    ],
+    "partner": [
+        ("Мои отели", partner_guarded),
+        ("Брони",     bookings_page.render),
+    ],
+    "guest": [
+        ("Мои брони", bookings_page.render),
+    ],
 }
 
-# fallback — если ключ неверный, покажем поиск
-page_map.get(st.session_state.page, lambda: search_page.render(goto))()
+left, right = st.columns([0.8, 0.2])
+with left:
+    topbar.render_header(goto)
+    labels_fns = tabs_by_role.get(role, tabs_by_role["guest"])
+    labels = [name for name, _ in labels_fns]
+    fns    = [fn   for _,    fn in labels_fns]
+    for tab, render_fn in zip(st.tabs(labels), fns):
+        with tab:
+            render_fn(goto)
+
+with right:
+    topbar.render_auth(goto)
+
+# fallback лучше убрать совсем (во избежание «дослойной» отрисовки)
