@@ -1,22 +1,30 @@
 import streamlit as st
+from core.guards import sign_out
 
-def render_topbar(goto):
-    st.markdown('<div class="top-navbar">', unsafe_allow_html=True)
-    c1, c2, c3, c4, c5, c6, c7 = st.columns([6, 1.2, 1.2, 1.6, 1.6, 1.8, 1.2])
-    with c2:
-        if st.button("Регистрация"): goto("register")
-    with c3:
-        if st.button("Вход"): goto("login")
-    with c4:
-        if st.button("Поиск отелей"): goto("search")
-    with c5:
-        if st.button("Мои бронирования"): goto("bookings")
-    with c6:
-        if st.button("Админ панель"): goto("admin")
-    with c7:
-        if st.button("Выйти"):
-            st.session_state.user = None
-            st.session_state.selected_hotel_id = None
-            goto("welcome")
-    st.markdown('</div>', unsafe_allow_html=True)
-    # не нужно больше <br><br><br> — отступ делает CSS (.block-container padding-top)
+def get_current_role() -> str:
+    user = st.session_state.get("user")
+    if user and "role" in user:
+        return user["role"]
+    return st.session_state.get("role", "guest")
+
+def render_auth(goto):
+    """Правая часть – всегда показываем."""
+    right = st.container()
+    with right:
+        user = st.session_state.get("user")
+        if user:
+            username = user.get("username", "Гость")
+            role = user.get("role", "guest")
+            st.caption(f"👤 {username} ({role})")
+            if st.button("Выйти", key="logout"):
+                sign_out()
+                st.success("Вы вышли из аккаунта.")
+                goto("welcome")
+
+def render_header(goto):
+    # --- Заголовок, кликабельный ---
+    col1, col2 = st.columns([0.8, 0.2])
+    with col1:
+        if st.button("Главная страница", use_container_width=False):
+            goto("welcome")   # переход на главную
+    return col1, col2

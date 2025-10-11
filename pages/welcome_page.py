@@ -18,9 +18,6 @@ def render(goto):
         with c2:
             if st.button("📚 Мои бронирования", use_container_width=True):
                 goto("bookings")
-        with c3:
-            if st.button("🛠️ Админ панель", use_container_width=True):
-                goto("admin")
     else:
         with c2:
             if st.button("🔑 Войти", use_container_width=True):

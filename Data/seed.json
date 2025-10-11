@@ -7,7 +7,8 @@
       "price": 25000,
       "rating": 4.8,
       "rooms": 120,
-      "available": true
+      "available": true,
+      "roomtype": ["Hotel", "Spa", "Resort"]
     },
     {
       "id": 2,
@@ -16,7 +17,8 @@
       "price": 40000,
       "rating": 4.9,
       "rooms": 90,
-      "available": true
+      "available": true,
+      "roomtype": ["Hotel", "Spa", "Resort"]
     },
     {
       "id": 3,
@@ -25,7 +27,8 @@
       "price": 15000,
       "rating": 4.2,
       "rooms": 60,
-      "available": true
+      "available": true,
+      "roomtype": ["Hotel", "Spa", "Resort"]
     }
   ],
   
