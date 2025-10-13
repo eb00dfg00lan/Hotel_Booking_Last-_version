@@ -39,3 +39,38 @@ div[data-testid="stDecoration"] { display: none !important; }
   .top-navbar button{ margin-left: 6px; padding: 6px 10px; }
   .block-container{ padding-top: calc(var(--topbar-height) + 12px) !important; }
 }
+
+/* общий вид блока фильтров */
+.filters-header {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+/* слайдерная полоса */
+.stSlider > div[data-baseweb="slider"] > div {
+    background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%) !important;
+    height: 6px !important;
+    border-radius: 8px !important;
+}
+
+/* бегунок */
+.stSlider span[data-baseweb="thumb"] {
+    background-color: #4CAF50 !important;
+    width: 20px !important;
+    height: 20px !important;
+    border: 2px solid white !important;
+    box-shadow: 0 0 6px rgba(0,0,0,0.25);
+    transition: 0.2s ease;
+}
+
+/* анимация при наведении */
+.stSlider span[data-baseweb="thumb"]:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 8px rgba(0,0,0,0.35);
+}
+
+/* подписи под ползунками */
+.stMarkdown p {
+    margin-bottom: 0;
+}

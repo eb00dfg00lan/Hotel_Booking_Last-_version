@@ -32,7 +32,8 @@ def init_db():
                 rooms INTEGER,
                 available INTEGER,
                 roomtype TEXT,
-                rateplan TEXT
+                rateplan TEXT,
+                owner_id INTEGER
             );
         """)
         cur.execute("""
@@ -157,7 +158,143 @@ def fetch_user_by_email(email: str):
         cur = conn.cursor()
         cur.execute("SELECT id, username, email FROM users WHERE email = ?", (email,))
         return cur.fetchone()
-    
+
+
+def fetch_partner_hotels(partner_id: int):
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, name, city, price, rating, rooms, available
+            FROM hotels
+            WHERE owner_id = ?
+            ORDER BY name
+        """, (partner_id,))
+        return cur.fetchall()
+
+
+def fetch_partner_bookings(partner_id: int):
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT
+                b.id          AS booking_id,
+                h.id          AS hotel_id,
+                h.name        AS hotel_name,
+                h.city        AS city,
+                b.check_in,
+                b.check_out,
+                b.guests,
+                h.price,
+                h.rating
+            FROM bookings b
+            JOIN hotels h ON h.id = b.hotel_id
+            WHERE h.owner_id = ?
+            ORDER BY b.id DESC
+        """, (partner_id,))
+        return cur.fetchall()
+
+
+def delete_hotel_owned(hotel_id: int, owner_id: int, is_admin: bool = False) -> bool:
+  
+    with get_connection() as conn:
+        conn.execute("PRAGMA foreign_keys = ON;")
+        cur = conn.cursor()
+
+        # Проверяем, что отель существует
+        cur.execute("SELECT owner_id FROM hotels WHERE id = ?", (hotel_id,))
+        row = cur.fetchone()
+        if not row:
+            return False  # нет такого отеля
+
+        real_owner_id = row[0]
+        if not is_admin and real_owner_id != owner_id:
+            return False  # чужой отель
+
+        # Сначала удаляем бронирования этого отеля
+        cur.execute("DELETE FROM bookings WHERE hotel_id = ?", (hotel_id,))
+
+        # Теперь удаляем сам отель
+        cur.execute("DELETE FROM hotels WHERE id = ?", (hotel_id,))
+        conn.commit()
+        return cur.rowcount > 0  # True, если хотя бы 1 строка удалена
+
+def delete_booking_owned(booking_id: int, owner_id: int, is_admin: bool = False) -> bool:
+    """
+    Удаляет конкретное бронирование, если:
+    - оно существует;
+    - отель этого бронирования принадлежит указанному owner_id;
+    - или пользователь — администратор.
+
+    Возвращает True, если удаление прошло успешно.
+    """
+    with get_connection() as conn:
+        conn.execute("PRAGMA foreign_keys = ON;")
+        cur = conn.cursor()
+
+        # Проверяем, что бронирование существует и кому принадлежит отель
+        cur.execute("""
+            SELECT h.owner_id
+            FROM bookings b
+            JOIN hotels h ON b.hotel_id = h.id
+            WHERE b.id = ?
+        """, (booking_id,))
+        row = cur.fetchone()
+        if not row:
+            return False  # нет такого бронирования
+
+        real_owner_id = row[0]
+        if not is_admin and real_owner_id != owner_id:
+            return False  # чужой отель — нельзя удалять
+
+        # Удаляем само бронирование
+        cur.execute("DELETE FROM bookings WHERE id = ?", (booking_id,))
+        conn.commit()
+        return cur.rowcount > 0  # True, если 1 строка удалена
+# tools/db.py
+def _csv_or_none(raw) -> str | None:
+    # принимает список/строку/None → "a,b,c" или None
+    if raw is None:
+        return None
+    if isinstance(raw, str):
+        s = raw.strip()
+        return s if s else None
+    if isinstance(raw, (list, tuple)):
+        items = [str(x).strip() for x in raw if str(x).strip()]
+        return ",".join(items) if items else None
+    return None
+
+def insert_hotel(
+    owner_id: int,
+    name: str,
+    city: str,
+    price: float,
+    rating: float,
+    rooms: int,
+    available: int,
+    roomtype=None,
+    rateplan=None,
+) -> int | None:
+    """
+    Добавляет отель, проставляя owner_id.
+    Возвращает id нового отеля или None при ошибке.
+    """
+    rt = _csv_or_none(roomtype)
+    rp = _csv_or_none(rateplan)
+
+    with get_connection() as conn:
+        conn.execute("PRAGMA foreign_keys = ON;")
+        cur = conn.cursor()
+        try:
+            cur.execute("""
+                INSERT INTO hotels
+                (name, city, price, rating, rooms, available, roomtype, rateplan, owner_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (name, city, price, rating, rooms, available, rt, rp, owner_id))
+            conn.commit()
+            return cur.lastrowid
+        except Exception:
+            return None
+
 if __name__ == "__main__":
     init_db()
 

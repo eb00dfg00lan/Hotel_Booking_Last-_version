@@ -1,4 +1,5 @@
 import streamlit as st
+from core.guards import sign_out
 
 def render(goto):
     # Hero
@@ -15,9 +16,31 @@ def render(goto):
             goto("search")
 
     if st.session_state.get("user"):
+        user = st.session_state["user"]
+        role = user.get("role", "guest")
+
         with c2:
-            if st.button("📚 Мои бронирования", use_container_width=True):
-                goto("bookings")
+            # 🔹 Для гостя — показываем "Мои бронирования"
+            if role == "guest":
+                if st.button("📚 Мои бронирования", use_container_width=True):
+                    goto("bookings")
+
+            # 🔹 Для партнёра — показываем "Мои отели"
+            elif role == "partner":
+                if st.button("🏨 Мои отели", use_container_width=True):
+                    goto("partner_hotels")
+
+            # 🔹 Для админа — панель администратора
+            elif role == "admin":
+                if st.button("⚙️ Панель администратора", use_container_width=True):
+                    goto("admin")
+
+        with c3:
+            if st.button("Выйти", key="logout"):
+                sign_out()
+                st.success("Вы вышли из аккаунта.")
+                goto("welcome")
+
     else:
         with c2:
             if st.button("🔑 Войти", use_container_width=True):
@@ -25,6 +48,7 @@ def render(goto):
         with c3:
             if st.button("📝 Регистрация", use_container_width=True):
                 goto("register")
+
 
     st.divider()
 

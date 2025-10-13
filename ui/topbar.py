@@ -11,6 +11,8 @@ def render_auth(goto):
     """Правая часть – всегда показываем."""
     right = st.container()
     with right:
+        if st.button("Поиск", key="search"):
+            goto("search")
         user = st.session_state.get("user")
         if user:
             username = user.get("username", "Гость")

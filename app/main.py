@@ -2,8 +2,8 @@ import streamlit as st
 from tools.db import init_db, seed_database
 from ui import topbar
 from pages import (
-    guest_page, booking_page, login_page, register_page, bookings_page,
-    partner_dashbord, admin_page, welcome_page, search_page
+    booking_page, login_page, register_page, booking_guest_page,booking_partner_page,my_hotels_page,
+    admin_page, welcome_page, search_page,add_hotel_page
 )
 from pathlib import Path
 from core.guards import require_roles
@@ -62,24 +62,35 @@ if ss.page == "welcome":
 if ss.page == "search":
     render_with_topbar(search_page.render); st.stop()
 
+if ss.page == "booking_guest":
+    render_with_topbar(booking_guest_page.render); st.stop()
+
+if ss.page == "booking_partner":
+    render_with_topbar(booking_partner_page.render); st.stop()
+
+if ss.page == "my_hotels":
+    render_with_topbar(my_hotels_page.render); st.stop()
+
 if ss.page == "Booking":
     render_with_topbar(booking_page.render); st.stop()
-
+if ss.page == "add_hotel":
+    render_with_topbar(add_hotel_page.render); st.stop()
 # --- ТАБОВЫЙ РЕЖИМ (как было, топбар уже есть) ---
 role = topbar.get_current_role() or ss.get("role", "guest")
 
 tabs_by_role = {
     "admin": [
-        ("Брони",     bookings_page.render),
+        ("Брони",     booking_page.render),
         ("Партнёры",  partner_guarded),
         ("Админ",     admin_guarded),
     ],
     "partner": [
-        ("Мои отели", partner_guarded),
-        ("Брони",     bookings_page.render),
+        ("Мои отели", my_hotels_page.render),
+        ("Брони",     booking_partner_page.render),
+        ("Добавить отель", add_hotel_page.render),
     ],
     "guest": [
-        ("Мои брони", bookings_page.render),
+        ("Мои брони", booking_guest_page.render),
     ],
 }
 
