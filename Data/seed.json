@@ -1,37 +1,829 @@
 {
-  "hotels": [
+  "users": [
     {
       "id": 1,
-      "name": "Hilton Almaty",
-      "city": "Almaty",
-      "price": 25000,
-      "rating": 4.8,
-      "rooms": 120,
-      "available": true,
-      "roomtype": ["Hotel", "Spa", "Resort"]
+      "username": "partner1",
+      "email": "partner1@hotel.test",
+      "password": "partner123",
+      "role": "partner"
     },
     {
       "id": 2,
-      "name": "Rixos Astana",
-      "city": "Astana",
-      "price": 40000,
-      "rating": 4.9,
-      "rooms": 90,
-      "available": true,
-      "roomtype": ["Hotel", "Spa", "Resort"]
+      "username": "partner2",
+      "email": "partner2@hotel.test",
+      "password": "partner123",
+      "role": "partner"
     },
     {
       "id": 3,
-      "name": "Aksunkar Hotel",
-      "city": "Shymkent",
-      "price": 15000,
-      "rating": 4.2,
-      "rooms": 60,
-      "available": true,
-      "roomtype": ["Hotel", "Spa", "Resort"]
+      "username": "partner3",
+      "email": "partner3@hotel.test",
+      "password": "partner123",
+      "role": "partner"
+    },
+    {
+      "id": 4,
+      "username": "partner4",
+      "email": "partner4@hotel.test",
+      "password": "partner123",
+      "role": "partner"
+    },
+    {
+      "id": 5,
+      "username": "partner5",
+      "email": "partner5@hotel.test",
+      "password": "partner123",
+      "role": "partner"
+    },
+    {
+      "id": 1001,
+      "username": "guest01",
+      "email": "guest01@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1002,
+      "username": "guest02",
+      "email": "guest02@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1003,
+      "username": "guest03",
+      "email": "guest03@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1004,
+      "username": "guest04",
+      "email": "guest04@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1005,
+      "username": "guest05",
+      "email": "guest05@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1006,
+      "username": "guest06",
+      "email": "guest06@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1007,
+      "username": "guest07",
+      "email": "guest07@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1008,
+      "username": "guest08",
+      "email": "guest08@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1009,
+      "username": "guest09",
+      "email": "guest09@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1010,
+      "username": "guest10",
+      "email": "guest10@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1011,
+      "username": "guest11",
+      "email": "guest11@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1012,
+      "username": "guest12",
+      "email": "guest12@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1013,
+      "username": "guest13",
+      "email": "guest13@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1014,
+      "username": "guest14",
+      "email": "guest14@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1015,
+      "username": "guest15",
+      "email": "guest15@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1016,
+      "username": "guest16",
+      "email": "guest16@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1017,
+      "username": "guest17",
+      "email": "guest17@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1018,
+      "username": "guest18",
+      "email": "guest18@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1019,
+      "username": "guest19",
+      "email": "guest19@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1020,
+      "username": "guest20",
+      "email": "guest20@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1021,
+      "username": "guest21",
+      "email": "guest21@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1022,
+      "username": "guest22",
+      "email": "guest22@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1023,
+      "username": "guest23",
+      "email": "guest23@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1024,
+      "username": "guest24",
+      "email": "guest24@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1025,
+      "username": "guest25",
+      "email": "guest25@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1026,
+      "username": "guest26",
+      "email": "guest26@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1027,
+      "username": "guest27",
+      "email": "guest27@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1028,
+      "username": "guest28",
+      "email": "guest28@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1029,
+      "username": "guest29",
+      "email": "guest29@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1030,
+      "username": "guest30",
+      "email": "guest30@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1031,
+      "username": "guest31",
+      "email": "guest31@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1032,
+      "username": "guest32",
+      "email": "guest32@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1033,
+      "username": "guest33",
+      "email": "guest33@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1034,
+      "username": "guest34",
+      "email": "guest34@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1035,
+      "username": "guest35",
+      "email": "guest35@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1036,
+      "username": "guest36",
+      "email": "guest36@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1037,
+      "username": "guest37",
+      "email": "guest37@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1038,
+      "username": "guest38",
+      "email": "guest38@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1039,
+      "username": "guest39",
+      "email": "guest39@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1040,
+      "username": "guest40",
+      "email": "guest40@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1041,
+      "username": "guest41",
+      "email": "guest41@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1042,
+      "username": "guest42",
+      "email": "guest42@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1043,
+      "username": "guest43",
+      "email": "guest43@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1044,
+      "username": "guest44",
+      "email": "guest44@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1045,
+      "username": "guest45",
+      "email": "guest45@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1046,
+      "username": "guest46",
+      "email": "guest46@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1047,
+      "username": "guest47",
+      "email": "guest47@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1048,
+      "username": "guest48",
+      "email": "guest48@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1049,
+      "username": "guest49",
+      "email": "guest49@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1050,
+      "username": "guest50",
+      "email": "guest50@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1051,
+      "username": "guest51",
+      "email": "guest51@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1052,
+      "username": "guest52",
+      "email": "guest52@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1053,
+      "username": "guest53",
+      "email": "guest53@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1054,
+      "username": "guest54",
+      "email": "guest54@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1055,
+      "username": "guest55",
+      "email": "guest55@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1056,
+      "username": "guest56",
+      "email": "guest56@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1057,
+      "username": "guest57",
+      "email": "guest57@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1058,
+      "username": "guest58",
+      "email": "guest58@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1059,
+      "username": "guest59",
+      "email": "guest59@example.com",
+      "password": "guest123",
+      "role": "guest"
+    },
+    {
+      "id": 1060,
+      "username": "guest60",
+      "email": "guest60@example.com",
+      "password": "guest123",
+      "role": "guest"
     }
   ],
-  
-  "bookings": [
-  ]
+  "hotels": [
+    {
+      "id": 1,
+      "name": "Almaty Grand Hotel 1",
+      "city": "Almaty",
+      "price": 48.2,
+      "rating": 4.8,
+      "rooms": 87,
+      "available": 1,
+      "roomtype": [
+        "Стандарт",
+        "Стандарт плюс",
+        "Стандарт делюкс",
+        "VIP стандарт",
+        "VIP плюс",
+        "VIP делюкс"
+      ],
+      "rateplan": [
+        "Обед",
+        "Бар",
+        "SPA",
+        "Wi‑Fi"
+      ],
+      "owner_id": 1
+    },
+    {
+      "id": 2,
+      "name": "Almaty Grand Hotel 2",
+      "city": "Almaty",
+      "price": 51.4,
+      "rating": 4.5,
+      "rooms": 94,
+      "available": 1,
+      "roomtype": [
+        "Стандарт",
+        "Стандарт плюс",
+        "Стандарт делюкс",
+        "VIP стандарт",
+        "VIP плюс",
+        "VIP делюкс"
+      ],
+      "rateplan": [
+        "Завтрак",
+        "Ужин",
+        "Напитки",
+        "Бассейн",
+        "Парковка"
+      ],
+      "owner_id": 2
+    },
+    {
+      "id": 3,
+      "name": "Almaty Grand Hotel 3",
+      "city": "Almaty",
+      "price": 54.6,
+      "rating": 4.2,
+      "rooms": 101,
+      "available": 1,
+      "roomtype": [
+        "Стандарт",
+        "Стандарт плюс",
+        "Стандарт делюкс",
+        "VIP стандарт",
+        "VIP плюс",
+        "VIP делюкс"
+      ],
+      "rateplan": [
+        "Обед",
+        "Бар",
+        "SPA",
+        "Wi‑Fi"
+      ],
+      "owner_id": 3
+    },
+    {
+      "id": 4,
+      "name": "Astana Grand Hotel 1",
+      "city": "Astana",
+      "price": 57.8,
+      "rating": 3.9,
+      "rooms": 108,
+      "available": 1,
+      "roomtype": [
+        "Стандарт",
+        "Стандарт плюс",
+        "Стандарт делюкс",
+        "VIP стандарт",
+        "VIP плюс",
+        "VIP делюкс"
+      ],
+      "rateplan": [
+        "Завтрак",
+        "Ужин",
+        "Напитки",
+        "Бассейн",
+        "Парковка"
+      ],
+      "owner_id": 4
+    },
+    {
+      "id": 5,
+      "name": "Astana Grand Hotel 2",
+      "city": "Astana",
+      "price": 61.0,
+      "rating": 3.6,
+      "rooms": 115,
+      "available": 1,
+      "roomtype": [
+        "Стандарт",
+        "Стандарт плюс",
+        "Стандарт делюкс",
+        "VIP стандарт",
+        "VIP плюс",
+        "VIP делюкс"
+      ],
+      "rateplan": [
+        "Обед",
+        "Бар",
+        "SPA",
+        "Wi‑Fi"
+      ],
+      "owner_id": 5
+    },
+    {
+      "id": 6,
+      "name": "Astana Grand Hotel 3",
+      "city": "Astana",
+      "price": 64.2,
+      "rating": 4.9,
+      "rooms": 122,
+      "available": 1,
+      "roomtype": [
+        "Стандарт",
+        "Стандарт плюс",
+        "Стандарт делюкс",
+        "VIP стандарт",
+        "VIP плюс",
+        "VIP делюкс"
+      ],
+      "rateplan": [
+        "Завтрак",
+        "Ужин",
+        "Напитки",
+        "Бассейн",
+        "Парковка"
+      ],
+      "owner_id": 1
+    },
+    {
+      "id": 7,
+      "name": "Shymkent Grand Hotel 1",
+      "city": "Shymkent",
+      "price": 67.4,
+      "rating": 4.6,
+      "rooms": 129,
+      "available": 1,
+      "roomtype": [
+        "Стандарт",
+        "Стандарт плюс",
+        "Стандарт делюкс",
+        "VIP стандарт",
+        "VIP плюс",
+        "VIP делюкс"
+      ],
+      "rateplan": [
+        "Обед",
+        "Бар",
+        "SPA",
+        "Wi‑Fi"
+      ],
+      "owner_id": 2
+    },
+    {
+      "id": 8,
+      "name": "Shymkent Grand Hotel 2",
+      "city": "Shymkent",
+      "price": 70.6,
+      "rating": 4.3,
+      "rooms": 136,
+      "available": 1,
+      "roomtype": [
+        "Стандарт",
+        "Стандарт плюс",
+        "Стандарт делюкс",
+        "VIP стандарт",
+        "VIP плюс",
+        "VIP делюкс"
+      ],
+      "rateplan": [
+        "Завтрак",
+        "Ужин",
+        "Напитки",
+        "Бассейн",
+        "Парковка"
+      ],
+      "owner_id": 3
+    },
+    {
+      "id": 9,
+      "name": "Shymkent Grand Hotel 3",
+      "city": "Shymkent",
+      "price": 73.8,
+      "rating": 4.0,
+      "rooms": 143,
+      "available": 1,
+      "roomtype": [
+        "Стандарт",
+        "Стандарт плюс",
+        "Стандарт делюкс",
+        "VIP стандарт",
+        "VIP плюс",
+        "VIP делюкс"
+      ],
+      "rateplan": [
+        "Обед",
+        "Бар",
+        "SPA",
+        "Wi‑Fi"
+      ],
+      "owner_id": 4
+    },
+    {
+      "id": 10,
+      "name": "Karaganda Grand Hotel 1",
+      "city": "Karaganda",
+      "price": 77.0,
+      "rating": 3.7,
+      "rooms": 150,
+      "available": 1,
+      "roomtype": [
+        "Стандарт",
+        "Стандарт плюс",
+        "Стандарт делюкс",
+        "VIP стандарт",
+        "VIP плюс",
+        "VIP делюкс"
+      ],
+      "rateplan": [
+        "Завтрак",
+        "Ужин",
+        "Напитки",
+        "Бассейн",
+        "Парковка"
+      ],
+      "owner_id": 5
+    },
+    {
+      "id": 11,
+      "name": "Karaganda Grand Hotel 2",
+      "city": "Karaganda",
+      "price": 80.2,
+      "rating": 5.0,
+      "rooms": 157,
+      "available": 1,
+      "roomtype": [
+        "Стандарт",
+        "Стандарт плюс",
+        "Стандарт делюкс",
+        "VIP стандарт",
+        "VIP плюс",
+        "VIP делюкс"
+      ],
+      "rateplan": [
+        "Обед",
+        "Бар",
+        "SPA",
+        "Wi‑Fi"
+      ],
+      "owner_id": 1
+    },
+    {
+      "id": 12,
+      "name": "Karaganda Grand Hotel 3",
+      "city": "Karaganda",
+      "price": 83.4,
+      "rating": 4.7,
+      "rooms": 164,
+      "available": 1,
+      "roomtype": [
+        "Стандарт",
+        "Стандарт плюс",
+        "Стандарт делюкс",
+        "VIP стандарт",
+        "VIP плюс",
+        "VIP делюкс"
+      ],
+      "rateplan": [
+        "Завтрак",
+        "Ужин",
+        "Напитки",
+        "Бассейн",
+        "Парковка"
+      ],
+      "owner_id": 2
+    },
+    {
+      "id": 13,
+      "name": "Aktobe Grand Hotel 1",
+      "city": "Aktobe",
+      "price": 86.6,
+      "rating": 4.4,
+      "rooms": 171,
+      "available": 1,
+      "roomtype": [
+        "Стандарт",
+        "Стандарт плюс",
+        "Стандарт делюкс",
+        "VIP стандарт",
+        "VIP плюс",
+        "VIP делюкс"
+      ],
+      "rateplan": [
+        "Обед",
+        "Бар",
+        "SPA",
+        "Wi‑Fi"
+      ],
+      "owner_id": 3
+    },
+    {
+      "id": 14,
+      "name": "Aktobe Grand Hotel 2",
+      "city": "Aktobe",
+      "price": 89.8,
+      "rating": 4.1,
+      "rooms": 178,
+      "available": 1,
+      "roomtype": [
+        "Стандарт",
+        "Стандарт плюс",
+        "Стандарт делюкс",
+        "VIP стандарт",
+        "VIP плюс",
+        "VIP делюкс"
+      ],
+      "rateplan": [
+        "Завтрак",
+        "Ужин",
+        "Напитки",
+        "Бассейн",
+        "Парковка"
+      ],
+      "owner_id": 4
+    },
+    {
+      "id": 15,
+      "name": "Aktobe Grand Hotel 3",
+      "city": "Aktobe",
+      "price": 93.0,
+      "rating": 3.8,
+      "rooms": 185,
+      "available": 1,
+      "roomtype": [
+        "Стандарт",
+        "Стандарт плюс",
+        "Стандарт делюкс",
+        "VIP стандарт",
+        "VIP плюс",
+        "VIP делюкс"
+      ],
+      "rateplan": [
+        "Обед",
+        "Бар",
+        "SPA",
+        "Wi‑Fi"
+      ],
+      "owner_id": 5
+    }
+  ],
+  "bookings": []
 }

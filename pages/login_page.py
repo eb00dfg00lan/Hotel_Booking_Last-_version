@@ -17,7 +17,7 @@ def render(goto):
                 cur = conn.cursor()
                 cur.execute("SELECT id, username, email, password, role FROM users WHERE email=?", (email.strip().lower(),))
                 user = cur.fetchone()
-                if user and _hash_password(password) == user[3]:
+                if user and password == user[3]:
                     st.session_state.user = {"id": user[0], "username": user[1], "email": user[2], "role": user[4]}
                     st.success(f"Добро пожаловать, {user[1]}({user[4]})!") 
                     if user[4] == "admin":

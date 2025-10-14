@@ -18,7 +18,7 @@ def render(goto):
     # Quick actions (adaptive to auth state)
     c1, c2, c3 = st.columns([1.2, 1.2, 1.2])
     with c1:
-        if st.button("🔍 Начать поиск", use_container_width=True, key="start_search"):
+        if st.button("Начать поиск", use_container_width=True, key="start_search"):
             goto("search")
 
     if st.session_state.get("user"):

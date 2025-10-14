@@ -13,13 +13,21 @@ def filter_available(hotels: Iterable[Hotel]) -> List[Hotel]:
 
 
 def total_booking_cost(booking: Booking, hotels: Iterable[Hotel]) -> float:
+    if not booking.items:
+        return 0.0
+
     total = 0.0
     for item in booking.items:
         hotel = next((h for h in hotels if h.id == item.hotel_id), None)
-        if not hotel:
-            continue
-        nights = (date.fromisoformat(item.checkout) - date.fromisoformat(item.checkin)).days
-        total += hotel.price * max(0, nights)
+        if hotel:
+            if isinstance(item.checkin, str):
+                from datetime import datetime
+                checkin = datetime.fromisoformat(item.checkin).date()
+                checkout = datetime.fromisoformat(item.checkout).date()
+            else:
+                checkin, checkout = item.checkin, item.checkout
+            nights = (checkout - checkin).days
+            total += hotel.price * max(0, nights)
     return total
 
 def total_cost_all(bookings: Iterable[Booking], hotels: Iterable[Hotel]) -> float:
