@@ -25,31 +25,34 @@ if "user" not in ss: ss.user = None           # <-- FIX: было ss.usern
 if "selected_hotel_id" not in ss: ss.selected_hotel_id = None
 if "role" not in ss: ss.role = "guest"
 
-# ... твои импорты/инициализация выше
+
 
 def goto(p: str):
     ss.page = p
-    st.rerun()
+    st.rerun()0
 
-# единый layout с топбаром
+
 def render_with_topbar(body_fn):
     left, right = st.columns([0.8, 0.2])
     with left:
-        topbar.render_header(goto)   # левый: логотип/меню/поиск и т.п.
-        body_fn(goto)                # тут рисуем саму страницу
+        topbar.render_header(goto)   
+        body_fn(goto)                
     with right:
-        topbar.render_auth(goto)     # правый: вход/аккаунт
+        topbar.render_auth(goto)    
 
-# --- guarded wrappers ---
+
 def partner_guarded(goto):
     require_roles("partner", "admin")
+    booking_partner_page.render(goto)
+
     my_hotels_page.render(goto)
+
 
 def admin_guarded(goto):
     require_roles("admin")
     admin_page.render(goto)
 
-# --- РАННИЕ ВЫХОДЫ: теперь с топбаром ---
+
 if ss.page == "login":
     render_with_topbar(login_page.render); st.stop()
 
@@ -75,7 +78,7 @@ if ss.page == "Booking":
     render_with_topbar(booking_page.render); st.stop()
 if ss.page == "add_hotel":
     render_with_topbar(add_hotel_page.render); st.stop()
-# --- ТАБОВЫЙ РЕЖИМ (как было, топбар уже есть) ---
+
 role = topbar.get_current_role() or ss.get("role", "guest")
 
 tabs_by_role = {
