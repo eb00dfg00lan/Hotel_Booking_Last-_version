@@ -17,14 +17,44 @@ div[data-testid="stDecoration"] { display: none !important; }
 }
 
 .top-navbar button{
-  border: none;
-  background: #f0f2f6;
-  border-radius: 8px;
-  padding: 6px 15px;
-  margin-left: 10px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background .2s ease;
+  .btn-three {
+  color: #FFF;
+  transition: all 0.5s;
+  position: relative;
+}
+.top-navbar::before button{
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background-color: rgba(255,255,255,0.1);
+  transition: all 0.3s;
+}
+.top-navbar:hover::before button{
+  opacity: 0 ;
+  transform: scale(0.5,0.5);
+}
+.top-navbar::after button{
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  opacity: 0;
+  transition: all 0.3s;
+  border: 1px solid rgba(255,255,255,0.5);
+  transform: scale(1.2,1.2);
+}
+.top-navbar:hover::after button{
+  opacity: 1;
+  transform: scale(1,1);
+}
+  
 }
 
 .top-navbar button:hover{ background: #e0e0e0; }
@@ -49,14 +79,14 @@ div[data-testid="stDecoration"] { display: none !important; }
 
 /* слайдерная полоса */
 .stSlider > div[data-baseweb="slider"] > div {
-    background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%) !important;
+    background: linear-gradient(90deg, #ffffff 0%, #ffffff 100%) !important;
     height: 6px !important;
     border-radius: 8px !important;
 }
 
 /* бегунок */
 .stSlider span[data-baseweb="thumb"] {
-    background-color: #4CAF50 !important;
+    background-color: #ffffff !important;
     width: 20px !important;
     height: 20px !important;
     border: 2px solid white !important;
@@ -73,4 +103,69 @@ div[data-testid="stDecoration"] { display: none !important; }
 /* подписи под ползунками */
 .stMarkdown p {
     margin-bottom: 0;
+}
+
+
+.main-title {
+    position: fixed;
+    top: 7px;
+    left: 20px;
+    font-size: 100px;
+    font-weight: 700;
+    color: #757575;
+    margin-bottom: 0.5rem;
+
+}
+
+.st-key-login { 
+    all: unset;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    height: 40px;
+    width: 160px;
+    color: #757575;
+    border: 2px solid #757575 !important;
+    border-radius: 12px;
+    text-align: center;
+}
+.st-key-signup { 
+    all: unset;
+    position: fixed;
+    top: 20px;
+    right: 200px;
+    height: 40px;
+    width: 160px;
+    color: #757575;
+    border: 2px solid #757575 !important;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.bg-container {
+    position: fixed;      /* фиксируем на экране */
+    bottom: 0;            /* внизу страницы */
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* выравниваем по нижнему краю */
+    z-index: 0;           /* низкий уровень */
+    pointer-events: none;  /* клики проходят сквозь блок */
+}
+
+.red1 {
+    width: 100px;
+    height: 100px;
+    background-color: rgb(37, 37, 37);
+}
+.red2 {
+    width: 100px;
+    height: 100px;
+    background-color: rgb(37, 37, 37);
+}
+
+.center-img {
+    margin: 0 20px;
+    max-height: 150px;
 }

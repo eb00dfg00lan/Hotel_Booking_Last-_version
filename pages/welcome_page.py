@@ -1,18 +1,24 @@
 import streamlit as st
 from core.guards import sign_out
 
+
+
 def render(goto):
     # Hero
-    st.markdown("## 🏨 Добро пожаловать в Hotel Booking System")
-    st.markdown(
-        "Найдите и забронируйте отель за пару кликов. "
-        "Используйте верхнее меню или начните отсюда ↓"
-    )
+    st.markdown("""<div class="bg-container">
+                <div class="box1"></div>
+                <div class="image"></div>
+                <div class="box2"></div>
+                </div>""", unsafe_allow_html=True)
+
+
+
+    st.markdown("""<div class="main-title"> booking.GO</div>""", unsafe_allow_html=True)
 
     # Quick actions (adaptive to auth state)
     c1, c2, c3 = st.columns([1.2, 1.2, 1.2])
     with c1:
-        if st.button("🔍 Начать поиск", use_container_width=True):
+        if st.button("🔍 Начать поиск", use_container_width=True, key="start_search"):
             goto("search")
 
     if st.session_state.get("user"):
@@ -43,14 +49,11 @@ def render(goto):
 
     else:
         with c2:
-            if st.button("🔑 Войти", use_container_width=True):
+            if st.button("Log in", key="login"):
                 goto("login")
         with c3:
-            if st.button("📝 Регистрация", use_container_width=True):
+            if st.button("Sign up", key="signup"):
                 goto("register")
-
-
-    st.divider()
 
     # Highlights / benefits
     st.markdown("### Почему мы?")

@@ -43,7 +43,7 @@ def render_with_topbar(body_fn):
 # --- guarded wrappers ---
 def partner_guarded(goto):
     require_roles("partner", "admin")
-    partner_dashbord.render(goto)
+    booking_partner_page.render(goto)
 
 def admin_guarded(goto):
     require_roles("admin")

@@ -13,13 +13,14 @@ def filter_available(hotels: Iterable[Hotel]) -> List[Hotel]:
 
 
 def total_booking_cost(booking: Booking, hotels: Iterable[Hotel]) -> float:
-    hotel = next((h for h in hotels if h.id == booking.hotel_id), None)
-    if not hotel:
-        return 0.0
-    nights = (booking.check_out - booking.check_in).days
-    return hotel.price * max(0, nights)
-
+    total = 0.0
+    for item in booking.items:
+        hotel = next((h for h in hotels if h.id == item.hotel_id), None)
+        if not hotel:
+            continue
+        nights = (date.fromisoformat(item.checkout) - date.fromisoformat(item.checkin)).days
+        total += hotel.price * max(0, nights)
+    return total
 
 def total_cost_all(bookings: Iterable[Booking], hotels: Iterable[Hotel]) -> float:
-    costs = map(lambda b: total_booking_cost(b, hotels), bookings)
-    return reduce(lambda a, b: a + b, costs, 0.0)
+    return sum(total_booking_cost(b, hotels) for b in bookings)
