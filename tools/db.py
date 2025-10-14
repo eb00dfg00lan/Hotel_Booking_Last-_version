@@ -1,5 +1,7 @@
+# tools/db.py
 import sqlite3
 from pathlib import Path
+from typing import Iterable, Optional
 from tools.utils import load_json
 
 DB_PATH = Path("Data/hotel_booking.db")
@@ -7,7 +9,10 @@ DB_PATH = Path("Data/hotel_booking.db")
 
 def get_connection():
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    return sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH)
+    # Полезно, чтобы получать dict-подобные результаты при желании
+    conn.row_factory = sqlite3.Row
+    return conn
 
 
 def init_db():
@@ -22,6 +27,7 @@ def init_db():
                 role TEXT NOT NULL CHECK(role IN ('guest', 'partner', 'admin'))
             );
         """)
+
         cur.execute("""
             CREATE TABLE IF NOT EXISTS hotels (
                 id INTEGER PRIMARY KEY,
@@ -31,11 +37,13 @@ def init_db():
                 rating REAL,
                 rooms INTEGER,
                 available INTEGER,
-                roomtype TEXT,
-                rateplan TEXT,
+                roomtype TEXT NOT NULL,                 -- CSV или JSON-строка-массив
+                rateplan TEXT NOT NULL,                 -- CSV или JSON-строка-массив
+                amenities TEXT NOT NULL DEFAULT '{}',
                 owner_id INTEGER
             );
         """)
+
         cur.execute("""
             CREATE TABLE IF NOT EXISTS bookings (
                 id INTEGER PRIMARY KEY,
@@ -48,10 +56,31 @@ def init_db():
                 FOREIGN KEY(hotel_id) REFERENCES hotels(id)
             );
         """)
+
+        # Индексы для скорости фильтров
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_hotels_city ON hotels(city);")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_hotels_owner ON hotels(owner_id);")
         conn.commit()
 
 
+def _list_to_csv(value) -> Optional[str]:
+    """Нормализует list -> CSV (или строку/None)."""
+    if value is None:
+        return None
+    if isinstance(value, list):
+        items = [str(t).strip() for t in value if t is not None and str(t).strip()]
+        return ",".join(items)
+    if isinstance(value, str):
+        return value.strip() or None
+    return str(value)
+
+
 def seed_database(seed_path: str = "Data/seed.json"):
+    """Засев БД из JSON.
+    Поддерживает, что в seed у отелей roomtype/rateplan могут быть списками.
+    Мы кладём их в БД в формате CSV (совместимо с текущими фильтрами).
+    Также теперь вставляем owner_id.
+    """
     data = load_json(seed_path)
     if not data:
         return
@@ -61,40 +90,27 @@ def seed_database(seed_path: str = "Data/seed.json"):
 
         # --- hotels
         for h in data.get("hotels", []):
-            # roomtype может быть списком или строкой
-            rt = h.get("roomtype")
-            if isinstance(rt, list):
-                roomtype_str = ",".join(t.strip() for t in rt if t and str(t).strip())
-            elif isinstance(rt, str):
-                roomtype_str = rt.strip()
-            else:
-                roomtype_str = None
+            roomtype_str = _list_to_csv(h.get("roomtype"))
+            rateplan_str = _list_to_csv(h.get("rateplan"))
+            amenities_str = h.get("amenities") if isinstance(h.get("amenities"), str) else "{}"
+            owner_id = h.get("owner_id")
 
-            # rateplan тоже может быть списком или строкой (ОТДЕЛЬНО от roomtype!)
-            rp = h.get("rateplan")
-            if isinstance(rp, list):
-                rateplan_str = ",".join(t.strip() for t in rp if t and str(t).strip())
-            elif isinstance(rp, str):
-                rateplan_str = rp.strip()
-            else:
-                rateplan_str = None
-
-            # ВАЖНО: число плейсхолдеров должно совпадать с числом колонок
             cur.execute("""
-                    INSERT OR IGNORE INTO hotels
-                    (id, name, city, price, rating, rooms, available, roomtype, rateplan)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT OR IGNORE INTO hotels
+                (id, name, city, price, rating, rooms, available, roomtype, rateplan, amenities, owner_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
-                h["id"], h["name"], h["city"], h["price"], h["rating"],
-                h["rooms"], int(h["available"]), roomtype_str, rateplan_str
+                h["id"], h.get("name"), h.get("city"), h.get("price"), h.get("rating"),
+                h.get("rooms"), int(h.get("available", 0)), roomtype_str, rateplan_str,
+                amenities_str, owner_id
             ))
 
         # --- users
         for u in data.get("users", []):
             cur.execute("""
-                INSERT OR IGNORE INTO users (id, username, email, password,role)
+                INSERT OR IGNORE INTO users (id, username, email, password, role)
                 VALUES (?, ?, ?, ?, ?)
-            """, (u["id"], u["username"], u["email"], u["password"],u["role"]))
+            """, (u["id"], u["username"], u["email"], u["password"], u["role"]))
 
         # --- bookings
         for b in data.get("bookings", []):
@@ -106,44 +122,95 @@ def seed_database(seed_path: str = "Data/seed.json"):
         conn.commit()
 
 
-def fetch_hotels(city: str = None, max_price: float = None,any_types: list[str] | None = None,
-                 all_types: list[str] | None = None,any_plans: list[str] | None = None,
-                 all_plans: list[str] | None = None):
+def _add_token_filters_sql(
+    base_query_parts: list[str],
+    params: list,
+    column: str,
+    tokens: Iterable[str],
+    require_all: bool
+):
+    """
+    Добавляет условия поиска токенов в колонке, которая может хранить CSV или JSON-массив.
+    Поддерживаются два варианта:
+      1) CSV: ',val1,val2,' и поиск через instr(','||col||',', ','||?||',')>0
+      2) JSON: '["val1","val2"]' и поиск через instr(col, '"'||?||'"')>0
+    """
+    tokens = [t for t in (tokens or []) if str(t).strip()]
+    if not tokens:
+        return
+
+    groups = []
+    for t in tokens:
+        # Один токен: найдём его либо как CSV-ячейку, либо как JSON-элемент в кавычках
+        groups.append(
+            f"(instr(',' || COALESCE({column}, '') || ',', ',' || ? || ',') > 0 "
+            f"OR instr(COALESCE({column}, ''), '\"' || ? || '\"') > 0)"
+        )
+        params.extend([t, t])
+
+    if require_all:
+        # Все токены должны встретиться
+        for g in groups:
+            base_query_parts.append(" AND " + g)
+    else:
+        # Достаточно любого из списка
+        base_query_parts.append(" AND (" + " OR ".join(groups) + ")")
+
+
+def fetch_hotels(
+    city: str = None,
+    max_price: float = None,
+    any_types: Optional[list[str]] = None,
+    all_types: Optional[list[str]] = None,
+    any_plans: Optional[list[str]] = None,
+    all_plans: Optional[list[str]] = None
+):
+    """
+    Поиск отелей с поддержкой фильтров:
+      - city: точное совпадение города
+      - max_price: цена <= max_price
+      - any_types: хотя бы один тип комнаты из списка
+      - all_types: содержать все типы комнаты из списка
+      - any_plans: хотя бы один тариф из списка
+      - all_plans: содержать все тарифы из списка
+
+    Колонки roomtype/rateplan могут содержать CSV или JSON-массив — обе формы поддержаны.
+    """
     with get_connection() as conn:
         cur = conn.cursor()
-        query = "SELECT id, name, city, price, rating, rooms, available,roomtype,rateplan FROM hotels WHERE 1=1"
-        params = []
+        query_parts = [
+            "SELECT id, name, city, price, rating, rooms, available, roomtype, rateplan, owner_id",
+            "FROM hotels",
+            "WHERE 1=1"
+        ]
+        params: list = []
+
         if city:
-            query += " AND city = ?"
+            query_parts.append(" AND city = ?")
             params.append(city)
+
         if max_price is not None:
-            query += " AND price <= ?"
+            query_parts.append(" AND price <= ?")
             params.append(max_price)
+
         if any_types:
-            parts = []
-            for t in any_types:
-                parts.append("instr(',' || COALESCE(roomtype,'') || ',', ',' || ? || ',') > 0")
-                params.append(t)
-            query += " AND (" + " OR ".join(parts) + ")"
+            _add_token_filters_sql(query_parts, params, "roomtype", any_types, require_all=False)
+
         if all_types:
-            for t in all_types:
-                query += " AND instr(',' || COALESCE(roomtype,'') || ',', ',' || ? || ',') > 0"
-                params.append(t)
+            _add_token_filters_sql(query_parts, params, "roomtype", all_types, require_all=True)
+
         if any_plans:
-            parts = []
-            for t in any_plans:
-                parts.append("instr(',' || COALESCE(rateplan,'') || ',', ',' || ? || ',') > 0")
-                params.append(t)
-            query += " AND (" + " OR ".join(parts) + ")"
+            _add_token_filters_sql(query_parts, params, "rateplan", any_plans, require_all=False)
+
         if all_plans:
-            for t in all_plans:
-                query += " AND instr(',' || COALESCE(rateplan,'') || ',', ',' || ? || ',') > 0"
-                params.append(t)
+            _add_token_filters_sql(query_parts, params, "rateplan", all_plans, require_all=True)
+
+        query = " ".join(query_parts)
         cur.execute(query, tuple(params))
         return cur.fetchall()
 
 
-def insert_booking(user_id: int, hotel_id: int, check_in: str, check_out: str, guests: int):
+def insert_booking(user_id: int, hotel_id: int, check_in: str, check_out: str, guests: int) -> int:
     with get_connection() as conn:
         cur = conn.cursor()
         cur.execute("""
@@ -151,12 +218,13 @@ def insert_booking(user_id: int, hotel_id: int, check_in: str, check_out: str, g
             VALUES (?, ?, ?, ?, ?)
         """, (user_id, hotel_id, check_in, check_out, guests))
         conn.commit()
+        return cur.lastrowid
 
 
 def fetch_user_by_email(email: str):
     with get_connection() as conn:
         cur = conn.cursor()
-        cur.execute("SELECT id, username, email FROM users WHERE email = ?", (email,))
+        cur.execute("SELECT id, username, email, password, role FROM users WHERE email = ?", (email,))
         return cur.fetchone()
 
 
@@ -195,43 +263,30 @@ def fetch_partner_bookings(partner_id: int):
 
 
 def delete_hotel_owned(hotel_id: int, owner_id: int, is_admin: bool = False) -> bool:
-  
     with get_connection() as conn:
         conn.execute("PRAGMA foreign_keys = ON;")
         cur = conn.cursor()
 
-        # Проверяем, что отель существует
         cur.execute("SELECT owner_id FROM hotels WHERE id = ?", (hotel_id,))
         row = cur.fetchone()
         if not row:
-            return False  # нет такого отеля
+            return False
 
         real_owner_id = row[0]
         if not is_admin and real_owner_id != owner_id:
-            return False  # чужой отель
+            return False
 
-        # Сначала удаляем бронирования этого отеля
         cur.execute("DELETE FROM bookings WHERE hotel_id = ?", (hotel_id,))
-
-        # Теперь удаляем сам отель
         cur.execute("DELETE FROM hotels WHERE id = ?", (hotel_id,))
         conn.commit()
-        return cur.rowcount > 0  # True, если хотя бы 1 строка удалена
+        return cur.rowcount > 0
+
 
 def delete_booking_owned(booking_id: int, owner_id: int, is_admin: bool = False) -> bool:
-    """
-    Удаляет конкретное бронирование, если:
-    - оно существует;
-    - отель этого бронирования принадлежит указанному owner_id;
-    - или пользователь — администратор.
-
-    Возвращает True, если удаление прошло успешно.
-    """
     with get_connection() as conn:
         conn.execute("PRAGMA foreign_keys = ON;")
         cur = conn.cursor()
 
-        # Проверяем, что бронирование существует и кому принадлежит отель
         cur.execute("""
             SELECT h.owner_id
             FROM bookings b
@@ -240,28 +295,16 @@ def delete_booking_owned(booking_id: int, owner_id: int, is_admin: bool = False)
         """, (booking_id,))
         row = cur.fetchone()
         if not row:
-            return False  # нет такого бронирования
+            return False
 
         real_owner_id = row[0]
         if not is_admin and real_owner_id != owner_id:
-            return False  # чужой отель — нельзя удалять
+            return False
 
-        # Удаляем само бронирование
         cur.execute("DELETE FROM bookings WHERE id = ?", (booking_id,))
         conn.commit()
-        return cur.rowcount > 0  # True, если 1 строка удалена
-# tools/db.py
-def _csv_or_none(raw) -> str | None:
-    # принимает список/строку/None → "a,b,c" или None
-    if raw is None:
-        return None
-    if isinstance(raw, str):
-        s = raw.strip()
-        return s if s else None
-    if isinstance(raw, (list, tuple)):
-        items = [str(x).strip() for x in raw if str(x).strip()]
-        return ",".join(items) if items else None
-    return None
+        return cur.rowcount > 0
+
 
 def insert_hotel(
     owner_id: int,
@@ -271,30 +314,35 @@ def insert_hotel(
     rating: float,
     rooms: int,
     available: int,
-    roomtype=None,
-    rateplan=None,
-) -> int | None:
+    roomtype: str,   # JSON-строка ИЛИ CSV
+    rateplan: str,   # JSON-строка ИЛИ CSV
+    amenities: str = "{}"
+) -> Optional[int]:
+    """Вставка отеля. Принимает roomtype/rateplan как JSON-строки или CSV.
+    Хранение — как есть (фильтры поддерживают оба варианта).
     """
-    Добавляет отель, проставляя owner_id.
-    Возвращает id нового отеля или None при ошибке.
-    """
-    rt = _csv_or_none(roomtype)
-    rp = _csv_or_none(rateplan)
-
-    with get_connection() as conn:
-        conn.execute("PRAGMA foreign_keys = ON;")
-        cur = conn.cursor()
-        try:
-            cur.execute("""
-                INSERT INTO hotels
-                (name, city, price, rating, rooms, available, roomtype, rateplan, owner_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (name, city, price, rating, rooms, available, rt, rp, owner_id))
+    try:
+        with get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute(
+                """
+                INSERT INTO hotels (
+                  owner_id, name, city, price, rating, rooms, available,
+                  roomtype, rateplan, amenities
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    owner_id, name, city, price, rating, rooms, available,
+                    roomtype, rateplan, amenities
+                ),
+            )
             conn.commit()
             return cur.lastrowid
-        except Exception:
-            return None
+    except Exception as e:
+        print("insert_hotel error:", repr(e))
+        return None
+
 
 if __name__ == "__main__":
     init_db()
-
