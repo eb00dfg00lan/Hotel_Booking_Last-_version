@@ -30,3 +30,41 @@ def filter_hotels(items: Sequence[Any], preds: Sequence[Predicate]) -> list:
     if not preds:
         return list(items)
     return [h for h in items if all(p(h) for p in preds)]
+def _make_roomtype_filter(demand: dict[str, int]):
+    """
+    demand: { "Стандарт": N, "VIP делюкс": M, ... }
+    Оставляем отели, у которых count >= N для каждого выбранного (N>0) типа.
+    """
+    # очищаем нули, чтобы не фильтровать по ним
+    demand = {k: int(v) for k, v in demand.items() if int(v) > 0}
+
+    def pred(h: dict) -> bool:
+        if not demand:
+            return True
+        rto = h.get("roomtype_obj", {}) or {}
+        for k, need in demand.items():
+            have = int((rto.get(k) or {}).get("count", 0))
+            if have < need:
+                return False
+        return True
+
+    return pred
+
+
+def _make_rateplan_filter(required_keys: list[str]):
+    """
+    required_keys: список ключей из JSON rateplan (breakfast, spa, ...),
+    которые пользователь отметил галочкой. Все должны быть has=True.
+    """
+    required_keys = [k for k in required_keys if k]  # на всякий случай
+
+    def pred(h: dict) -> bool:
+        if not required_keys:
+            return True
+        rp = h.get("rateplan_obj", {}) or {}
+        for k in required_keys:
+            if not (rp.get(k) or {}).get("has", False):
+                return False
+        return True
+
+    return pred

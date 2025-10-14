@@ -43,7 +43,7 @@ def render_with_topbar(body_fn):
 # --- guarded wrappers ---
 def partner_guarded(goto):
     require_roles("partner", "admin")
-    partner_dashbord.render(goto)
+    my_hotels_page.render(goto)
 
 def admin_guarded(goto):
     require_roles("admin")
@@ -106,5 +106,3 @@ with left:
 
 with right:
     topbar.render_auth(goto)
-
-# fallback лучше убрать совсем (во избежание «дослойной» отрисовки)
