@@ -1,24 +1,110 @@
 import streamlit as st
 from core.guards import sign_out
 
-
-
 def render(goto):
-    # Hero
-    st.markdown("""<div class="bg-container">
-                <div class="box1"></div>
-                <div class="image"></div>
-                <div class="box2"></div>
-                </div>""", unsafe_allow_html=True)
+    # Фон и базовые стили
+    st.markdown("""
+    <style>
+    /* Основной контейнер Streamlit */
+    html, body, [class*="stApp"] {
+        background-color: black !important; /* чёрный фон */
+        color: white;
+        position: relative;
+        z-index: 0; /* нейтральный уровень — не перекрывает кнопки */
+    }
+
+    /* Отдельный фоновый слой — без отрицательного z-index */
+    .bg-layer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: black;
+        z-index: 0; /* просто на заднем плане, но не отрицательно */
+    }
+    </style>
+
+    <div class="bg-layer"></div>
+    """, unsafe_allow_html=True)
+    st.markdown("""
+    <div style="border: none; height: 2px; width: 100%; background-color: rgb(255, 0, 85); top: 67px; right: 0; position: fixed; z-index: 1;"></div>
+""", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="border: none; height: 54%; width: 2px; background-color: rgb(255, 0, 85); top: 67px; right: 20px; position: fixed; z-index: 1;"></div>
+""", unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div style="border: none; height: 2px; width: 36%; background-color: rgb(255, 0, 85); top: 150px; right: 0; position: fixed; z-index: 1;"></div>
+""", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="border: none; height: 2px; width: 100%; background-color: rgb(255, 0, 85); top: 60.5%; right: 0; position: fixed; z-index: 1;"></div>
+""", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="border: none; height: 100%; width: 2px; background-color: rgb(255, 0, 85); top: 67px; right: 36%; position: fixed; z-index: 1;"></div>
+""", unsafe_allow_html=True)
 
 
+    
+    # Дополнительный HTML для твоих блоков
+    st.markdown("""
+    <div class="bg-container">
+        <div class="box1"></div>
+        <div class="image"></div>
+        <div class="box2"></div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown("""<div class="main-title"> booking.GO</div>""", unsafe_allow_html=True)
+    # Текстовые элементы
+    st.markdown("""<div class="main-title"> booking x GO</div>""", unsafe_allow_html=True)
+    st.markdown("""<div class="main-1"> GO</div>""", unsafe_allow_html=True)
+    st.markdown("""<div class="main-2"> GO</div>""", unsafe_allow_html=True)
+    st.markdown("""<div class="main-3"> GO</div>""", unsafe_allow_html=True)
+    st.markdown("""<div class="main-4"> GO</div>""", unsafe_allow_html=True)
 
-    # Quick actions (adaptive to auth state)
+    st.markdown("""<div class="main-aboutus"> about us</div>""", unsafe_allow_html=True)
+
+    st.markdown("""
+<style>
+.about-box {
+    width: 600px;
+    height: 400px;
+    position: fixed;
+    top: 170px;
+    right: 20px;
+    font-weight: bold;
+    background-color: rgba(0, 0, 0);
+    color: rgb(255, 0, 85);
+    position: fixed;
+    font-size: 30px;
+    padding: 15px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: flex-start; /* по горизонтали — влево */
+    align-items: flex-start;     /* по вертикали — вверх */
+    text-align: right; 
+    margin: 0;
+}
+</style>
+
+<div class="about-box">
+  <p>
+  We are a passionate team dedicated to making travel easier, faster, and more enjoyable.
+  Our mission is to connect people with the best booking experiences,
+  using technology that feels simple and human. <br><br>
+  At <b>Booking x GO</b>, we believe every journey starts with one click —
+  and we make sure that click is worth it.
+  </p>
+</div>
+""", unsafe_allow_html=True)
+    # Колонки с кнопками
     c1, c2, c3 = st.columns([1.2, 1.2, 1.2])
+
     with c1:
-        if st.button("Начать поиск", use_container_width=True, key="start_search"):
+        if st.button("**search**", use_container_width=True, key="start_search"):
             goto("search")
 
     if st.session_state.get("user"):
@@ -26,43 +112,26 @@ def render(goto):
         role = user.get("role", "guest")
 
         with c2:
-            # 🔹 Для гостя — показываем "Мои бронирования"
             if role == "guest":
-                if st.button("📚 Мои бронирования", use_container_width=True):
+                if st.button("My Bookings", use_container_width=True):
                     goto("bookings")
-
-            # 🔹 Для партнёра — показываем "Мои отели"
             elif role == "partner":
-                if st.button("🏨 Мои отели", use_container_width=True):
+                if st.button("My Hotels", use_container_width=True):
                     goto("partner_hotels")
-
-            # 🔹 Для админа — панель администратора
             elif role == "admin":
-                if st.button("⚙️ Панель администратора", use_container_width=True):
+                if st.button("⚙️ Admin Panel", use_container_width=True):
                     goto("admin")
 
         with c3:
-            if st.button("Выйти", key="logout"):
+            if st.button("Log Out", key="logout"):
                 sign_out()
-                st.success("Вы вышли из аккаунта.")
+                st.success("You have been logged out.")
                 goto("welcome")
 
     else:
         with c2:
-            if st.button("Log in", key="login"):
+            if st.button("**Log in**", key="login"):
                 goto("login")
         with c3:
-            if st.button("Sign up", key="signup"):
+            if st.button("**Sign up**", key="signup"):
                 goto("register")
-
-    # Highlights / benefits
-    st.markdown("### Почему мы?")
-    b1, b2, b3 = st.columns(3)
-    with b1:
-        st.markdown("**⚡ Быстро**  \nФильтры по городу, цене и ★ за пару секунд.")
-    with b2:
-        st.markdown("**💳 Прозрачно**  \nЦена за ночь и итог за всё пребывание.")
-    with b3:
-        st.markdown("**🔒 Безопасно**  \nРегистрация и вход — в пару кликов.")
-
-    st.caption("Совет: начните с «🔍 Начать поиск», затем выберите отель и оформите бронь на отдельной странице «Booking».")

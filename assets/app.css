@@ -4,60 +4,33 @@ div[data-testid="stToolbar"] { display: none !important; }
 header { visibility: hidden; height: 0 !important; }
 div[data-testid="stDecoration"] { display: none !important; }
 
+
 /* ===== Top navbar (ваш фиксированный хедер) ===== */
 :root { --topbar-height: 60px; }
 
 .top-navbar{
   position: fixed;
   top: 0; left: 0; right: 0;
-  background: #fff;
+  background: #000000;
   box-shadow: 0 2px 8px rgba(0,0,0,.1);
   padding: 10px 25px;
   z-index: 9999;
 }
-
-.top-navbar button{
-  .btn-three {
-  color: #FFF;
-  transition: all 0.5s;
-  position: relative;
-}
-.top-navbar::before button{
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  background-color: rgba(255,255,255,0.1);
-  transition: all 0.3s;
-}
-.top-navbar:hover::before button{
-  opacity: 0 ;
-  transform: scale(0.5,0.5);
-}
-.top-navbar::after button{
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  opacity: 0;
-  transition: all 0.3s;
-  border: 1px solid rgba(255,255,255,0.5);
-  transform: scale(1.2,1.2);
-}
-.top-navbar:hover::after button{
-  opacity: 1;
-  transform: scale(1,1);
-}
-  
+div.stButton > button {
+    border-radius: 0px !important;   /* убираем скругление */
+    background-color: rgb(0, 0, 0) !important; /* можно поменять цвет */
+    color: rgb(255, 0, 85) !important;          /* цвет текста */
+    border: 2px solid rgb(255, 0, 85) !important;          /* убираем рамку */
+    padding: 0.6em 1.2em !important;  /* отступы */
+    font-weight: bold !important;
+    cursor: pointer;
 }
 
-.top-navbar button:hover{ background: #e0e0e0; }
+div.stButton > button:hover {
+    background-color: rgb(255, 0, 85) !important;
+    color: rgb(0, 0, 0) !important; /* эффект наведения */
+}
+
 
 /* Отодвинем контент вниз, чтобы не прятался под фикс-баром */
 .block-container{ padding-top: calc(var(--topbar-height) + 16px) !important; }
@@ -77,19 +50,40 @@ div[data-testid="stDecoration"] { display: none !important; }
     margin-bottom: 0.5rem;
 }
 
+.stTextBox > textarea {
+    background-color: #000000 !important;
+    padding: 10px !important;
+    border-color: rgb(255, 0, 85) !important;
+    color: rgb(255, 0, 85) !important;
+}
+.stTextInput > input {
+    background-color: #000000 !important;
+    padding: 10px !important;
+    border-color: rgb(255, 0, 85) !important;
+    color: rgb(255, 0, 85) !important;
+}
+.stExpanderHeader {
+    background-color: #000000 !important;
+    border: 2px solid rgb(255, 0, 85) !important;
+    color: rgb(255, 0, 85) !important;
+}
+.stCheckbox > div {
+    color: rgb(255, 0, 85) !important;
+    background-color: #000000 !important;
+}
 /* слайдерная полоса */
 .stSlider > div[data-baseweb="slider"] > div {
-    background: linear-gradient(90deg, #ffffff 0%, #ffffff 100%) !important;
+    background: linear-gradient(90deg, #000000 0%, rgb(0, 0, 0) 100%) !important;
     height: 6px !important;
     border-radius: 8px !important;
 }
 
 /* бегунок */
 .stSlider span[data-baseweb="thumb"] {
-    background-color: #ffffff !important;
+    background-color: hsl(0, 0%, 0%) !important;
     width: 20px !important;
     height: 20px !important;
-    border: 2px solid white !important;
+    border: 2px solid rgb(255, 0, 85) !important;
     box-shadow: 0 0 6px rgba(0,0,0,0.25);
     transition: 0.2s ease;
 }
@@ -108,13 +102,55 @@ div[data-testid="stDecoration"] { display: none !important; }
 
 .main-title {
     position: fixed;
-    top: 7px;
-    left: 20px;
-    font-size: 100px;
+    font-size: 150px;
     font-weight: 700;
-    color: #757575;
-    margin-bottom: 0.5rem;
+    height: 150%;
+    color: rgb(255, 0, 85) ;      /* делает буквы пустыми внутри */
+    -webkit-text-stroke: 2px rgb(255, 0, 85);       /* контур вокруг букв *               /* создаёт эффект свечения */
+    text-align: center;
+    top: 200px;
+    left: 30px;
 
+}
+.main-1 {
+    position: fixed;
+    font-size: 150px;
+    font-weight: 700;
+    color: transparent;      /* делает буквы пустыми внутри */
+    -webkit-text-stroke: 2px rgb(255, 0, 85);       /* контур вокруг букв *               /* создаёт эффект свечения */
+    text-align: center;
+    top: 340px;
+    left: 100px;
+}
+.main-2 {
+    position: fixed;
+    font-size: 150px;
+    font-weight: 700;
+    color: transparent;      /* делает буквы пустыми внутри */
+    -webkit-text-stroke: 2px rgb(182, 0, 61);       /* контур вокруг букв *               /* создаёт эффект свечения */
+    text-align: center;
+    top: 340px;
+    left: 350px;
+}
+.main-3 {
+    position: fixed;
+    font-size: 150px;
+    font-weight: 700;
+    color: transparent;      /* делает буквы пустыми внутри */
+    -webkit-text-stroke: 2px rgb(107, 0, 36);       /* контур вокруг букв *               /* создаёт эффект свечения */
+    text-align: center;
+    top: 340px;
+    left: 600px;
+}
+.main-4 {
+    position: fixed;
+    font-size: 150px;
+    font-weight: 700;
+    color: transparent;      /* делает буквы пустыми внутри */
+    -webkit-text-stroke: 2px rgb(41, 0, 14);       /* контур вокруг букв *               /* создаёт эффект свечения */
+    text-align: center;
+    top: 340px;
+    left: 850px;
 }
 
 .st-key-signup { 
@@ -124,63 +160,50 @@ div[data-testid="stDecoration"] { display: none !important; }
     right: 20px;
     height: 40px;
     width: 160px;
-    color: #0059ff;
-    border: 2px solid #0059ff !important;
-    border-radius: 12px;
     text-align: center;
 }
 .st-key-login { 
     all: unset;
     position: fixed;
     top: 20px;
-    right: 200px;
+    right: 178px;
     height: 40px;
     width: 160px;
-    color: #3f0c0c;
-    border: 2px solid #3f0c0c !important;
-    border-radius: 12px;
     text-align: center;
-}
-
-.bg-container {
-    position: fixed;      /* фиксируем на экране */
-    bottom: 0;            /* внизу страницы */
-    left: 0;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end; /* выравниваем по нижнему краю */
-    z-index: 0;           /* низкий уровень */
-    pointer-events: none;  /* клики проходят сквозь блок */
-}
-
-.red1 {
-    width: 100px;
-    height: 100px;
-    background-color: rgb(37, 37, 37);
-}
-.red2 {
-    width: 100px;
-    height: 100px;
-    background-color: rgb(37, 37, 37);
-}
-
-.center-img {
-    margin: 0 20px;
-    max-height: 150px;
 }
 
 .st-key-start_search { 
     all: unset;
     position: fixed;
     bottom: 20px;
-    right: 380px;
+    right: 336px;
     top: 20px;
     height: 40px;
     width: 160px;
-    color: #48ff00;
-    border: 2px solid #48ff00 !important;
-    border-radius: 12px;
     text-align: center;
-    z-index: 9999;
+}
+
+.main-aboutus {
+    position: fixed;
+    font-size: 50px;
+    font-weight: 700;
+    color: rgb(255, 0, 85) ;      /* делает буквы пустыми внутри */
+    -webkit-text-stroke: 1px rgb(255, 0, 85);       /* контур вокруг букв *               /* создаёт эффект свечения */
+    text-align: center;
+    top: 80px;
+    right: 50px;
+
+}
+
+
+
+.main-text {
+    position: fixed;
+    font-size: 20px;
+    font-weight: 400;
+    color: rgb(255, 0, 85) ;      /* делает буквы пустыми внутри */
+    text-align: left;
+    top: 100px;
+    right: 50px;
+    
 }
