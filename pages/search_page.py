@@ -25,21 +25,17 @@ from tools.db import (
 
 # --- Константы UI -------------------------------------------------------------
 ROOMTYPE_FIXED = [
-    "Стандарт",
-    "Стандарт плюс",
-    "Стандарт делюкс",
-    "VIP стандарт",
-    "VIP плюс",
-    "VIP делюкс",
+    "Standard",
+    "Standard Plus",
+    "Standard Deluxe",
+    "VIP Standard",
+    "VIP Plus",
+    "VIP Deluxe",
 ]
-EXTRAS = ["Завтрак", "Обед", "Ужин", "Бар", "Напитки", "SPA", "Бассейн", "Wi-Fi", "Парковка"]
+EXTRAS = ["Breakfast", "Lunch", "Dinner", "Bar", "Drinks", "SPA", "Pool", "Wi-Fi", "Parking"]
 
 
 # --- Утилиты ------------------------------------------------------------------
-def load_css(path="assets/app.css"):
-    css = Path(path).read_text(encoding="utf-8")
-    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
-    
 def _parse_list_field(raw) -> list[str]:
     """Принимает CSV/JSON/список/строку и возвращает список строк."""
     if raw is None:
@@ -119,63 +115,84 @@ def _load_calendar_data(
 
 # --- Рендер страницы ----------------------------------------------------------
 def render(goto):
-    st.title("🔍 Поиск отелей")
+    st.markdown("""
+    <style>
+    /* Основной контейнер Streamlit */
+    html, body, [class*="stApp"] {
+        background-color: black !important; /* чёрный фон */
+        color: white;
+        position: relative;
+        z-index: 0; /* нейтральный уровень — не перекрывает кнопки */
+    }
+
+    /* Отдельный фоновый слой — без отрицательного z-index */
+    .bg-layer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: black;
+        z-index: 0; /* просто на заднем плане, но не отрицательно */
+    }
+    </style>
+
+    <div class="bg-layer"></div>
+    """, unsafe_allow_html=True)
+    st.title("Search Hotels")
     load_css("assets/app.css")
 
     # rows: id, name, city, price, rating, rooms, available, roomtype, rateplan, owner_id
     rows = fetch_hotels() or []
 
-    # --- Фильтры ---
-    st.markdown('<div class="filters-header">⚙️ Фильтры</div>', unsafe_allow_html=True)
-
+    # базовые фильтры
+    st.markdown('<div class="filters-header">⚙️ Filters</div>', unsafe_allow_html=True)
     cities = sorted({str(r[2]) for r in rows if r[2]}) if rows else []
-    city = st.selectbox("🏙️ Город", ["Все"] + cities)
+    city = st.selectbox("🏙️ City", ["All"] + cities)
 
     max_price_in_data = max((int(r[3]) for r in rows if r[3] is not None), default=100000)
     slider_max = max(10000, ((max_price_in_data // 10000) + 1) * 10000)
 
     colA, colB = st.columns(2)
     with colA:
-        st.markdown("💰 **Максимальная цена** (₸/ночь)")
+        st.markdown("💰 **Max Price** (₸/night)")
         max_price = st.slider("", 0, slider_max, min(slider_max, 50000), key="price_slider")
     with colB:
-        st.markdown("⭐ **Минимальный рейтинг**")
+        st.markdown("⭐ **Min Rating**")
         min_stars = st.slider("", 1, 5, 3, key="stars_slider")
 
     # Типы номеров (roomtype)
-    with st.expander("Типы номеров", expanded=True):
+    with st.expander("Room Types", expanded=True):
         col1, col2, col3 = st.columns(3)
         with col1:
-            rt_std = st.checkbox("Стандарт", key="rt_std")
-            rt_std_plus = st.checkbox("Стандарт плюс", key="rt_std_plus")
+            rt_std       = st.checkbox("Standard", key="rt_std")
+            rt_std_plus  = st.checkbox("Standard Plus", key="rt_std_plus")
         with col2:
-            rt_std_delux = st.checkbox("Стандарт делюкс", key="rt_std_delux")
-            rt_vip_std = st.checkbox("VIP стандарт", key="rt_vip_std")
+            rt_std_delux = st.checkbox("Standard Deluxe", key="rt_std_delux")
+            rt_vip_std   = st.checkbox("VIP Standard", key="rt_vip_std")
         with col3:
-            rt_vip_plus = st.checkbox("VIP плюс", key="rt_vip_plus")
-            rt_vip_delux = st.checkbox("VIP делюкс", key="rt_vip_delux")
-        rt_mode = st.radio("Совпадение типов", ["Любой", "Все"], horizontal=True, key="rt_mode")
+            rt_vip_plus  = st.checkbox("VIP Plus", key="rt_vip_plus")
+            rt_vip_delux = st.checkbox("VIP Deluxe", key="rt_vip_delux")
+        rt_mode = st.radio("Room Type Match", ["Any", "All"], horizontal=True, key="rt_mode")
         selected_roomtypes = [
-            name
-            for flag, name in [
-                (rt_std, "Стандарт"),
-                (rt_std_plus, "Стандарт плюс"),
-                (rt_std_delux, "Стандарт делюкс"),
-                (rt_vip_std, "VIP стандарт"),
-                (rt_vip_plus, "VIP плюс"),
-                (rt_vip_delux, "VIP делюкс"),
-            ]
-            if flag
+            name for flag, name in [
+                (rt_std, "Standard"),
+                (rt_std_plus, "Standard Plus"),
+                (rt_std_delux, "Standard Deluxe"),
+                (rt_vip_std, "VIP Standard"),
+                (rt_vip_plus, "VIP Plus"),
+                (rt_vip_delux, "VIP Deluxe"),
+            ] if flag
         ]
 
     # Доп-услуги (rateplan)
-    with st.expander("Дополнительные услуги", expanded=True):
+    with st.expander("More Services", expanded=True):
         c1, c2, c3 = st.columns(3)
         flags = {}
         for idx, name in enumerate(EXTRAS):
             with (c1 if idx % 3 == 0 else c2 if idx % 3 == 1 else c3):
                 flags[name] = st.checkbox(name, key=f"rp_{_norm(name)}")
-        rp_mode = st.radio("Совпадение услуг", ["Любая", "Все"], horizontal=True, key="rp_mode")
+        rp_mode = st.radio("More Services", ["Any", "All"], horizontal=True, key="rp_mode")
         selected_extras = [name for name, f in flags.items() if f]
 
     # --- Подготовка данных для списка ---
@@ -188,9 +205,9 @@ def render(goto):
                 "id": int(r[0]),
                 "name": r[1],
                 "city": r[2],
-                "price": int(r[3]),
-                "rating": float(r[4]),
-                "rooms": int(r[5]),
+                "price": int(r[3]) if r[3] is not None else None,
+                "rating": float(r[4]) if r[4] is not None else 0.0,
+                "rooms": int(r[5]) if r[5] is not None else 0,
                 "available": bool(r[6]),
                 "roomtype_list": roomtype_list,
                 "rateplan_list": rateplan_list,
@@ -202,42 +219,41 @@ def render(goto):
         make_price_range_filter(0, max_price),
         make_stars_filter(min_stars),
         _make_name_presence_filter(
-            "roomtype_list", selected_roomtypes, require_all=(rt_mode == "Все")
+            "roomtype_list", selected_roomtypes, require_all=(rt_mode == "All")
         ),
         _make_name_presence_filter(
-            "rateplan_list", selected_extras, require_all=(rp_mode == "Все")
+            "rateplan_list", selected_extras, require_all=(rp_mode == "All")
         ),
     ]
 
     filtered = filter_hotels(items, preds)
 
     if not filtered:
-        st.info("Нет отелей по заданным критериям. Попробуйте снять часть фильтров (типы/услуги).")
+        st.info("No hotels found matching your criteria.")
         return
 
     # --- Список результатов ---
     for h in filtered:
         stars = max(1, min(5, int(round(h["rating"]))))
         with st.expander(f"{h['name']} — {h['city']} ⭐ {stars}", expanded=False):
-            st.write(f"**Цена за ночь:** {h['price']} ₸")
-            st.write(f"**Рейтинг:** {h['rating']:.1f}")
-            st.write(f"**Номеров всего:** {h['rooms']}")
-            st.write(f"**Доступно сейчас:** {'✅ Есть' if h['available'] else '❌ Нет'}")
+            st.write(f"**Price to this night:** {_fmt_money(h['price'])}")
+            st.write(f"**Rating:** {h['rating']:.1f}")
+            st.write(f"**Total Rooms:** {h['rooms']}")
+            st.write(f"**Available Now:** {'✅ Yes' if h['available'] else '❌ No'}")
             if h.get("roomtype_list"):
-                st.write("**Типы номеров:** " + ", ".join(sorted(set(h["roomtype_list"]))))
+                st.write("**Room Types:** " + ", ".join(sorted(set(h["roomtype_list"]))))
             if h.get("rateplan_list"):
-                st.write("**Доп. услуги:** " + ", ".join(sorted(set(h["rateplan_list"]))))
+                st.write("**More Services:** " + ", ".join(sorted(set(h["rateplan_list"]))))
 
-            # Кнопка перехода на бронирование
-            if st.button("Забронировать", key=f"book_{h['id']}"):
+            if st.button("Book Now", key=f"book_{h['id']}"):
                 if not st.session_state.get("user"):
-                    st.error("Сначала войдите в систему.")
+                    st.error("Please log in first.")
                 else:
                     st.session_state.selected_hotel_id = h["id"]
                     goto("booking")  # маршрут в нижнем регистре
 
             # --- Календарь цен для этого отеля ---
-            with st.expander("📅 Показать календарь цен", expanded=False):
+            with st.expander("📅 Show price calendar", expanded=False):
                 # TODO: замените на выбранные room_type_id/rate_id
                 room_type_id = 1
                 rate_id = 1
@@ -298,9 +314,9 @@ def render(goto):
                 # Управляющие элементы
                 top_l, top_r = st.columns([1, 1])
                 with top_l:
-                    st.caption("Клик 1 — **заезд**, клик 2 — **выезд**. Повторный клик по заезду — сброс.")
+                    st.caption("Click 1 — **check-in**, click 2 — **check-out**. Click again on check-in to reset.")
                 with top_r:
-                    if st.button("Очистить выбор", key=f"clear_{cal_id}", use_container_width=True):
+                    if st.button("Clear selection", key=f"clear_{cal_id}", use_container_width=True):
                         st.session_state[cin_key] = None
                         st.session_state[cout_key] = None
                         # удаляем только ключи этого календаря
@@ -333,23 +349,23 @@ def render(goto):
                         d = d + timedelta(days=1)
 
                     msg = (
-                        f"**Заезд:** {cin}  ·  **Выезд:** {cout}  ·  "
-                        f"**Ночей:** {nights}  ·  **Сумма:** {_fmt_money(total)}"
+                        f"**Check-in:** {cin}  ·  **Check-out:** {cout}  ·  "
+                        f"**Nights:** {nights}  ·  **Total:** {_fmt_money(total)}"
                     )
                     (st.success if ok else st.warning)(
-                        msg + ("" if ok else "  ·  ⚠️ Есть недоступные/пустые дни в диапазоне")
+                        msg + ("" if ok else "  ·  ⚠️ There are unavailable/empty days in the range")
                     )
-                    if ok and st.button("✅ Подтвердить даты", key=f"confirm_{cal_id}", type="primary", use_container_width=True):
+                    if ok and st.button("✅ Confirm dates", key=f"confirm_{cal_id}", type="primary", use_container_width=True):
                         st.session_state[f"selected_range_{cal_id}"] = {
                             "checkin": cin,
                             "checkout": cout,
                             "nights": nights,
                             "total": total,
                         }
-                        st.toast(f"Выбрано: {cin} → {cout} ({nights} ноч.)")
+                        st.toast(f"Selected: {cin} → {cout} ({nights} nights)")
 
                 elif cin and not cout:
-                    st.info(f"Выберите дату выезда после {cin}")
+                    st.info(f"Select a check-out date after {cin}")
 
                 # Рендер сетки
                 for week in grid:
