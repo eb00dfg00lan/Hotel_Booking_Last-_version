@@ -29,7 +29,7 @@ if "role" not in ss: ss.role = "guest"
 
 def goto(p: str):
     ss.page = p
-    st.rerun()0
+    st.rerun()
 
 
 def render_with_topbar(body_fn):
