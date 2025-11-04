@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass,field
 from typing import Tuple, Optional, Dict
 
 @dataclass(frozen=True)
@@ -80,10 +80,10 @@ class Event:
     id: int
     ts: str
     name: str
-    payload: Dict
+    payload: Dict= field(compare=False)
 
 @dataclass(frozen=True)
 class Rule:
     id: int
     kind: str
-    payload: Dict
+    payload: Dict= field(compare=False)

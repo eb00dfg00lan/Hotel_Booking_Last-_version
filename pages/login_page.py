@@ -1,10 +1,5 @@
-import re
-import hashlib
 import streamlit as st
 from tools.db import get_connection
-
-def _hash_password(password: str) -> str:
-    return hashlib.sha256(password.encode()).hexdigest()
 
 def render(goto):
     st.title("Log in")
@@ -23,9 +18,9 @@ def render(goto):
                     if user[4] == "admin":
                         goto("admin")
                     elif user[4] == "partner":
-                        goto("partner")
+                        goto("my_hotels")
                     else:
-                        goto("guest")
+                        goto("booking_guest")
                 else:
                     st.error("Неверные данные.")
     with c2:

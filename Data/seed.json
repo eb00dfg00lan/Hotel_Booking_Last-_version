@@ -825,5 +825,463 @@
       "owner_id": 5
     }
   ],
+  "prices": [
+    {
+      "id": 1,
+      "rate_id": 1,
+      "date": "2025-10-01",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 2,
+      "rate_id": 1,
+      "date": "2025-10-02",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 3,
+      "rate_id": 1,
+      "date": "2025-10-03",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 4,
+      "rate_id": 1,
+      "date": "2025-10-04",
+      "amount": 3000000,
+      "currency": "KZT"
+    },
+    {
+      "id": 5,
+      "rate_id": 1,
+      "date": "2025-10-05",
+      "amount": 3000000,
+      "currency": "KZT"
+    },
+    {
+      "id": 6,
+      "rate_id": 1,
+      "date": "2025-10-06",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 7,
+      "rate_id": 1,
+      "date": "2025-10-07",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 8,
+      "rate_id": 1,
+      "date": "2025-10-08",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 9,
+      "rate_id": 1,
+      "date": "2025-10-09",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 10,
+      "rate_id": 1,
+      "date": "2025-10-10",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 11,
+      "rate_id": 1,
+      "date": "2025-10-11",
+      "amount": 3000000,
+      "currency": "KZT"
+    },
+    {
+      "id": 12,
+      "rate_id": 1,
+      "date": "2025-10-12",
+      "amount": 3000000,
+      "currency": "KZT"
+    },
+    {
+      "id": 13,
+      "rate_id": 1,
+      "date": "2025-10-13",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 14,
+      "rate_id": 1,
+      "date": "2025-10-14",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 15,
+      "rate_id": 1,
+      "date": "2025-10-15",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 16,
+      "rate_id": 1,
+      "date": "2025-10-16",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 17,
+      "rate_id": 1,
+      "date": "2025-10-17",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 18,
+      "rate_id": 1,
+      "date": "2025-10-18",
+      "amount": 3000000,
+      "currency": "KZT"
+    },
+    {
+      "id": 19,
+      "rate_id": 1,
+      "date": "2025-10-19",
+      "amount": 3000000,
+      "currency": "KZT"
+    },
+    {
+      "id": 20,
+      "rate_id": 1,
+      "date": "2025-10-20",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 21,
+      "rate_id": 1,
+      "date": "2025-10-21",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 22,
+      "rate_id": 1,
+      "date": "2025-10-22",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 23,
+      "rate_id": 1,
+      "date": "2025-10-23",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 24,
+      "rate_id": 1,
+      "date": "2025-10-24",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 25,
+      "rate_id": 1,
+      "date": "2025-10-25",
+      "amount": 3000000,
+      "currency": "KZT"
+    },
+    {
+      "id": 26,
+      "rate_id": 1,
+      "date": "2025-10-26",
+      "amount": 3000000,
+      "currency": "KZT"
+    },
+    {
+      "id": 27,
+      "rate_id": 1,
+      "date": "2025-10-27",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 28,
+      "rate_id": 1,
+      "date": "2025-10-28",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 29,
+      "rate_id": 1,
+      "date": "2025-10-29",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 30,
+      "rate_id": 1,
+      "date": "2025-10-30",
+      "amount": 2500000,
+      "currency": "KZT"
+    },
+    {
+      "id": 31,
+      "rate_id": 1,
+      "date": "2025-10-31",
+      "amount": 2500000,
+      "currency": "KZT"
+    }
+  ],
+  "availability": [
+    {
+      "id": 1,
+      "room_type_id": 1,
+      "date": "2025-10-01",
+      "available": 3
+    },
+    {
+      "id": 2,
+      "room_type_id": 1,
+      "date": "2025-10-02",
+      "available": 0
+    },
+    {
+      "id": 3,
+      "room_type_id": 1,
+      "date": "2025-10-03",
+      "available": 3
+    },
+    {
+      "id": 4,
+      "room_type_id": 1,
+      "date": "2025-10-04",
+      "available": 5
+    },
+    {
+      "id": 5,
+      "room_type_id": 1,
+      "date": "2025-10-05",
+      "available": 5
+    },
+    {
+      "id": 6,
+      "room_type_id": 1,
+      "date": "2025-10-06",
+      "available": 0
+    },
+    {
+      "id": 7,
+      "room_type_id": 1,
+      "date": "2025-10-07",
+      "available": 3
+    },
+    {
+      "id": 8,
+      "room_type_id": 1,
+      "date": "2025-10-08",
+      "available": 3
+    },
+    {
+      "id": 9,
+      "room_type_id": 1,
+      "date": "2025-10-09",
+      "available": 3
+    },
+    {
+      "id": 10,
+      "room_type_id": 1,
+      "date": "2025-10-10",
+      "available": 0
+    },
+    {
+      "id": 11,
+      "room_type_id": 1,
+      "date": "2025-10-11",
+      "available": 5
+    },
+    {
+      "id": 12,
+      "room_type_id": 1,
+      "date": "2025-10-12",
+      "available": 5
+    },
+    {
+      "id": 13,
+      "room_type_id": 1,
+      "date": "2025-10-13",
+      "available": 3
+    },
+    {
+      "id": 14,
+      "room_type_id": 1,
+      "date": "2025-10-14",
+      "available": 0
+    },
+    {
+      "id": 15,
+      "room_type_id": 1,
+      "date": "2025-10-15",
+      "available": 3
+    },
+    {
+      "id": 16,
+      "room_type_id": 1,
+      "date": "2025-10-16",
+      "available": 3
+    },
+    {
+      "id": 17,
+      "room_type_id": 1,
+      "date": "2025-10-17",
+      "available": 3
+    },
+    {
+      "id": 18,
+      "room_type_id": 1,
+      "date": "2025-10-18",
+      "available": 5
+    },
+    {
+      "id": 19,
+      "room_type_id": 1,
+      "date": "2025-10-19",
+      "available": 5
+    },
+    {
+      "id": 20,
+      "room_type_id": 1,
+      "date": "2025-10-20",
+      "available": 0
+    },
+    {
+      "id": 21,
+      "room_type_id": 1,
+      "date": "2025-10-21",
+      "available": 3
+    },
+    {
+      "id": 22,
+      "room_type_id": 1,
+      "date": "2025-10-22",
+      "available": 3
+    },
+    {
+      "id": 23,
+      "room_type_id": 1,
+      "date": "2025-10-23",
+      "available": 3
+    },
+    {
+      "id": 24,
+      "room_type_id": 1,
+      "date": "2025-10-24",
+      "available": 3
+    },
+    {
+      "id": 25,
+      "room_type_id": 1,
+      "date": "2025-10-25",
+      "available": 5
+    },
+    {
+      "id": 26,
+      "room_type_id": 1,
+      "date": "2025-10-26",
+      "available": 5
+    },
+    {
+      "id": 27,
+      "room_type_id": 1,
+      "date": "2025-10-27",
+      "available": 3
+    },
+    {
+      "id": 28,
+      "room_type_id": 1,
+      "date": "2025-10-28",
+      "available": 3
+    },
+    {
+      "id": 29,
+      "room_type_id": 1,
+      "date": "2025-10-29",
+      "available": 3
+    },
+    {
+      "id": 30,
+      "room_type_id": 1,
+      "date": "2025-10-30",
+      "available": 0
+    },
+    {
+      "id": 31,
+      "room_type_id": 1,
+      "date": "2025-10-31",
+      "available": 3
+    }
+  ],
+  "rules": [
+    {
+      "id": 1,
+      "kind": "min_stay",
+      "payload": {
+        "room_type_id": 1,
+        "rate_id": 1,
+        "value": 2
+      }
+    },
+    {
+      "id": 2,
+      "kind": "cta",
+      "payload": {
+        "room_type_id": 1,
+        "rate_id": 1,
+        "date": "2025-10-06",
+        "value": true
+      }
+    },
+    {
+      "id": 3,
+      "kind": "ctd",
+      "payload": {
+        "room_type_id": 1,
+        "rate_id": 1,
+        "date": "2025-10-10",
+        "value": true
+      }
+    },
+    {
+      "id": 4,
+      "kind": "cta",
+      "payload": {
+        "room_type_id": 1,
+        "rate_id": 1,
+        "date": "2025-10-20",
+        "value": true
+      }
+    },
+    {
+      "id": 5,
+      "kind": "ctd",
+      "payload": {
+        "room_type_id": 1,
+        "rate_id": 1,
+        "date": "2025-10-25",
+        "value": true
+      }
+    }
+  ],
   "bookings": []
 }

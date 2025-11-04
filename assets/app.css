@@ -184,3 +184,11 @@ div[data-testid="stDecoration"] { display: none !important; }
     text-align: center;
     z-index: 9999;
 }
+
+/* assets/app.css */
+.cal a{display:block;padding:.5rem .6rem;border:1px solid #e6e6e6;border-radius:.75rem;text-decoration:none;color:inherit;line-height:1.2}
+.cal a:hover{background:#f7f7f7}
+.cal a.muted{opacity:.45;pointer-events:none}
+.cal a.in-range{background:rgba(56,149,253,.10);border-color:rgba(56,149,253,.25)}
+.cal a.edge{background:rgba(56,149,253,.25);border-color:rgba(56,149,253,.45);font-weight:700}
+.cal b{font-variant-numeric:tabular-nums}

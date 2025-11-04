@@ -1,14 +1,32 @@
+import secrets
+from typing import cast
 import streamlit as st
 from datetime import date, timedelta
+
 from tools.db import fetch_hotels, insert_booking
+
+# наш «контейнер» (валидатор+Either)
+from core.container import  Booking
+from core.container import Either, validate_booking, quote_amount
+from pages import booking_guest_page
+# (опционально, если будешь считать по реальным Price/Availability/Rule)
+# from core.offers import quote_offer
+# from core.domain import Price, Availability, Rule
+
 
 def render(goto):
     st.title("Бронирование")
-    if not st.session_state.get("user"):
+    ss = st.session_state
+    if "confirm_ctx" not in ss: 
+        ss.confirm_ctx = None        # { "booking": Booking, "total": int, "tx_key": str, "nonce": str }
+    if "last_committed_key" not in ss: 
+        ss.last_committed_key = None
+
+    if not ss.get("user"):
         st.error("Сначала войдите в систему.")
         return
 
-    sel_id = st.session_state.get("selected_hotel_id")
+    sel_id = ss.get("selected_hotel_id")
     if not sel_id:
         st.info("Сначала выберите отель в поиске.")
         if st.button("← К поиску"):
@@ -19,7 +37,7 @@ def render(goto):
     row = next((r for r in rows if int(r[0]) == int(sel_id)), None)
     if not row:
         st.error("Отель не найден.")
-        st.session_state.selected_hotel_id = None
+        ss.selected_hotel_id = None
         if st.button("← К поиску"):
             goto("search")
         return
@@ -41,16 +59,73 @@ def render(goto):
     c1, c2 = st.columns(2)
     with c1:
         if st.button("Подтвердить", key=f"confirm_{h['id']}"):
-            if nights <= 0:
-                st.error("Выезд должен быть позже заезда минимум на 1 день.")
+            # 1) собираем черновик
+            draft = Booking(
+                user_id=ss["user"]["id"],
+                hotel_id=h["id"],
+                check_in=check_in,
+                check_out=check_out,
+                guests=int(guests),
+                nightly_price=int(h["price"]),
+            )
+            # 2) валидируем и считаем сумму (Either)
+            result = (
+                validate_booking(draft)                     # Either[dict, Booking]
+                .map(lambda b: (b, quote_amount(b)))        # Either[dict, tuple[Booking,int]]
+            )
+
+            if not result.is_right:
+                err = cast(dict, result.get_or_else({}))
+                for k, v in err.items():
+                    st.error(f"❌ {k}: {v}")
             else:
-                insert_booking(
-                    st.session_state["user"]["id"], h["id"],
-                    check_in.isoformat(), check_out.isoformat(), int(guests)
-                )
-                st.success("Бронирование создано.")
-                st.session_state.selected_hotel_id = None
-                goto("bookings")
+                b, total = result.get_or_else((None, 0))
+                # 3) запускаем ПАНЕЛЬ ПОДТВЕРЖДЕНИЯ (а не пишем в БД сразу)
+                tx_key = f"{b.user_id}:{b.hotel_id}:{b.check_in.isoformat()}:{b.check_out.isoformat()}:{b.guests}"
+                ss.confirm_ctx = {
+                    "booking": b,
+                    "total": total,
+                    "tx_key": tx_key,
+                    "nonce": secrets.token_hex(3),
+                }
+
     with c2:
         if st.button("← Назад к поиску"):
             goto("search")
+
+    # --- ПАНЕЛЬ ПОДТВЕРЖДЕНИЯ ---
+    if ss.confirm_ctx:
+        ctx = ss.confirm_ctx
+        b: Booking = ctx["booking"]
+        total = ctx["total"]
+        tx_key = ctx["tx_key"]
+        nonce = ctx["nonce"]
+
+        st.markdown("---")
+        with st.container(border=True):
+            st.subheader("Подтверждение бронирования")
+            st.write(f"**Отель:** {h['name']} ({h['city']})")
+            st.write(f"**Даты:** {b.check_in.isoformat()} → {b.check_out.isoformat()}  •  **Ночей:** {(b.check_out - b.check_in).days}")
+            st.write(f"**Гостей:** {b.guests}")
+            st.write(f"**Сумма:** **{total} ₸**")
+
+            cc1, cc2 = st.columns(2)
+            with cc1:
+                if st.button("✅ Да, подтвердить", key=f"confirm_yes_{nonce}"):
+                    # идемпотентность
+                    if ss.last_committed_key != tx_key:
+                        insert_booking(
+                            b.user_id, b.hotel_id,
+                            b.check_in.isoformat(), b.check_out.isoformat(),
+                            b.guests
+                        )
+                        ss.last_committed_key = tx_key
+                    st.success("Бронирование создано.")
+                    ss.selected_hotel_id = None
+                    ss.confirm_ctx = None
+                    goto(booking_guest_page)
+
+            with cc2:
+                if st.button("↩ Отмена", key=f"confirm_cancel_{nonce}"):
+                    ss.confirm_ctx = None
+                    st.info("Подтверждение отменено.")

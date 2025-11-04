@@ -1,8 +1,16 @@
 # tools/db.py
 import sqlite3
+import json
+from datetime import date
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Tuple, List
+
 from tools.utils import load_json
+
+# Эти датаклассы используются, чтобы вернуть данные в удобной форме
+from core.domain import Price, Availability, Rule
+# Нужен для выборки диапазона дат под календарную сетку (6 недель)
+from core.dates import month_grid_bounds
 
 DB_PATH = Path("Data/hotel_booking.db")
 
@@ -62,7 +70,51 @@ def init_db():
         cur.execute("CREATE INDEX IF NOT EXISTS idx_hotels_owner ON hotels(owner_id);")
         conn.commit()
 
+    # Доп. таблицы под price-календарь
+    ensure_calendar_tables()
 
+
+# ---------- Блок price-календаря: таблицы/миграции ----------
+def ensure_calendar_tables():
+    """Создаёт таблицы и индексы под календарь цен/доступности/правил."""
+    with get_connection() as conn:
+        cur = conn.cursor()
+
+        # room_types / rate_plans вы можете хранить отдельно; для календаря достаточно связок ids
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS prices (
+            id INTEGER PRIMARY KEY,
+            rate_id INTEGER NOT NULL,
+            date TEXT NOT NULL,          -- 'YYYY-MM-DD'
+            amount INTEGER NOT NULL,     -- сумма в тыйын/копейках
+            currency TEXT NOT NULL
+        );
+        """)
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_prices_rate_date ON prices(rate_id, date);")
+
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS availability (
+            id INTEGER PRIMARY KEY,
+            room_type_id INTEGER NOT NULL,
+            date TEXT NOT NULL,          -- 'YYYY-MM-DD'
+            available INTEGER NOT NULL   -- остаток на дату
+        );
+        """)
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_avail_rt_date ON availability(room_type_id, date);")
+
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS rules (
+            id INTEGER PRIMARY KEY,
+            kind TEXT NOT NULL,          -- 'min_stay' | 'max_stay' | 'cta' | 'ctd'
+            payload TEXT NOT NULL        -- JSON: {"room_type_id":int,"rate_id":int,"value":..., "date":"YYYY-MM-DD"}
+        );
+        """)
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_rules_kind ON rules(kind);")
+
+        conn.commit()
+
+
+# ---------- Сервис для CSV/JSON полей в hotels ----------
 def _list_to_csv(value) -> Optional[str]:
     """Нормализует list -> CSV (или строку/None)."""
     if value is None:
@@ -75,15 +127,19 @@ def _list_to_csv(value) -> Optional[str]:
     return str(value)
 
 
+# ---------- Засев БД из seed.json ----------
 def seed_database(seed_path: str = "Data/seed.json"):
     """Засев БД из JSON.
     Поддерживает, что в seed у отелей roomtype/rateplan могут быть списками.
     Мы кладём их в БД в формате CSV (совместимо с текущими фильтрами).
-    Также теперь вставляем owner_id.
+    Также вставляем owner_id.
+    Дополнительно: загружаем prices/availability/rules, если присутствуют.
     """
     data = load_json(seed_path)
     if not data:
         return
+
+    ensure_calendar_tables()
 
     with get_connection() as conn:
         cur = conn.cursor()
@@ -119,9 +175,31 @@ def seed_database(seed_path: str = "Data/seed.json"):
                 VALUES (?, ?, ?, ?, ?, ?)
             """, (b["id"], b["user_id"], b["hotel_id"], b["check_in"], b["check_out"], b["guests"]))
 
+        # --- prices (для календаря)
+        for p in data.get("prices", []):
+            cur.execute("""
+                INSERT OR REPLACE INTO prices(id, rate_id, date, amount, currency)
+                VALUES(?,?,?,?,?)
+            """, (p.get("id"), p["rate_id"], p["date"], p["amount"], p.get("currency", "KZT")))
+
+        # --- availability (для календаря)
+        for a in data.get("availability", []):
+            cur.execute("""
+                INSERT OR REPLACE INTO availability(id, room_type_id, date, available)
+                VALUES(?,?,?,?)
+            """, (a.get("id"), a["room_type_id"], a["date"], a["available"]))
+
+        # --- rules (для календаря)
+        for r in data.get("rules", []):
+            cur.execute("""
+                INSERT OR REPLACE INTO rules(id, kind, payload)
+                VALUES(?,?,?)
+            """, (r.get("id"), r["kind"], json.dumps(r.get("payload", {}))))
+
         conn.commit()
 
 
+# ---------- Поиск отелей с фильтрами ----------
 def _add_token_filters_sql(
     base_query_parts: list[str],
     params: list,
@@ -342,6 +420,68 @@ def insert_hotel(
     except Exception as e:
         print("insert_hotel error:", repr(e))
         return None
+
+
+# ---------- Выборки под price-календарь ----------
+def fetch_prices_for_calendar(rate_id: int, month_start: date) -> Tuple[Price, ...]:
+    """Возвращает цены для rate_id в пределах календарной сетки месяца (6 недель)."""
+    ensure_calendar_tables()
+    grid_start, grid_end = month_grid_bounds(month_start)
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, rate_id, date, amount, currency
+            FROM prices
+            WHERE rate_id = ?
+              AND date >= ?
+              AND date < ?
+            ORDER BY date ASC
+        """, (rate_id, grid_start.isoformat(), grid_end.isoformat()))
+        rows = cur.fetchall()
+    items: List[Price] = [Price(int(r[0]), int(r[1]), r[2], int(r[3]), r[4]) for r in rows]
+    return tuple(items)
+
+
+def fetch_availability_for_calendar(room_type_id: int, month_start: date) -> Tuple[Availability, ...]:
+    """Возвращает доступность для room_type_id в пределах календарной сетки месяца (6 недель)."""
+    ensure_calendar_tables()
+    grid_start, grid_end = month_grid_bounds(month_start)
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, room_type_id, date, available
+            FROM availability
+            WHERE room_type_id = ?
+              AND date >= ?
+              AND date < ?
+            ORDER BY date ASC
+        """, (room_type_id, grid_start.isoformat(), grid_end.isoformat()))
+        rows = cur.fetchall()
+    items: List[Availability] = [Availability(int(r[0]), int(r[1]), r[2], int(r[3])) for r in rows]
+    return tuple(items)
+
+
+def fetch_rules_for_rate(room_type_id: int, rate_id: int) -> Tuple[Rule, ...]:
+    """Возвращает правила, подходящие под room_type_id/rate_id (фильтр в Python)."""
+    ensure_calendar_tables()
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT id, kind, payload FROM rules")
+        rows = cur.fetchall()
+    out: List[Rule] = []
+    for r in rows:
+        try:
+            payload = json.loads(r[2]) if r[2] else {}
+        except Exception:
+            payload = {}
+        # Если payload пуст — считаем глобальным правилом
+        if payload:
+            if payload.get("room_type_id") not in (None, room_type_id):
+                continue
+            if payload.get("rate_id") not in (None, rate_id):
+                continue
+        out.append(Rule(int(r[0]), r[1], payload))
+    return tuple(out)
 
 
 if __name__ == "__main__":

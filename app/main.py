@@ -29,16 +29,14 @@ if "role" not in ss: ss.role = "guest"
 
 def goto(p: str):
     ss.page = p
-    st.rerun()0
+    st.rerun()
 
 
 def render_with_topbar(body_fn):
     left, right = st.columns([0.8, 0.2])
     with left:
         topbar.render_header(goto)   
-        body_fn(goto)                
-    with right:
-        topbar.render_auth(goto)    
+        body_fn(goto)   
 
 
 def partner_guarded(goto):
@@ -78,34 +76,3 @@ if ss.page == "Booking":
     render_with_topbar(booking_page.render); st.stop()
 if ss.page == "add_hotel":
     render_with_topbar(add_hotel_page.render); st.stop()
-
-role = topbar.get_current_role() or ss.get("role", "guest")
-
-tabs_by_role = {
-    "admin": [
-        ("Брони",     booking_page.render),
-        ("Партнёры",  partner_guarded),
-        ("Админ",     admin_guarded),
-    ],
-    "partner": [
-        ("Мои отели", my_hotels_page.render),
-        ("Брони",     booking_partner_page.render),
-        ("Добавить отель", add_hotel_page.render),
-    ],
-    "guest": [
-        ("Мои брони", booking_guest_page.render),
-    ],
-}
-
-left, right = st.columns([0.8, 0.2])
-with left:
-    topbar.render_header(goto)
-    labels_fns = tabs_by_role.get(role, tabs_by_role["guest"])
-    labels = [name for name, _ in labels_fns]
-    fns    = [fn   for _,    fn in labels_fns]
-    for tab, render_fn in zip(st.tabs(labels), fns):
-        with tab:
-            render_fn(goto)
-
-with right:
-    topbar.render_auth(goto)
