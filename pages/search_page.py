@@ -115,32 +115,9 @@ def _load_calendar_data(
 
 # --- Рендер страницы ----------------------------------------------------------
 def render(goto):
-    st.markdown("""
-    <style>
-    /* Основной контейнер Streamlit */
-    html, body, [class*="stApp"] {
-        background-color: black !important; /* чёрный фон */
-        color: white;
-        position: relative;
-        z-index: 0; /* нейтральный уровень — не перекрывает кнопки */
-    }
-
-    /* Отдельный фоновый слой — без отрицательного z-index */
-    .bg-layer {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: black;
-        z-index: 0; /* просто на заднем плане, но не отрицательно */
-    }
-    </style>
-
-    <div class="bg-layer"></div>
-    """, unsafe_allow_html=True)
+   
     st.title("Search Hotels")
-    load_css("assets/app.css")
+    #load_css("assets/app.css")
 
     # rows: id, name, city, price, rating, rooms, available, roomtype, rateplan, owner_id
     rows = fetch_hotels() or []

@@ -15,7 +15,7 @@ def load_css(path="assets/app.css"):
 
 # --- app setup ---
 st.set_page_config(page_title="Hotel Booking System", page_icon="🏨", layout="wide")
-load_css()
+#load_css()
 init_db(); seed_database()
 
 # --- session defaults ---

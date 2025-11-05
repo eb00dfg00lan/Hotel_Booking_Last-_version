@@ -11,7 +11,6 @@ div[data-testid="stDecoration"] { display: none !important; }
 .top-navbar{
   position: fixed;
   top: 0; left: 0; right: 0;
-  background: #000000;
   box-shadow: 0 2px 8px rgba(0,0,0,.1);
   padding: 10px 25px;
   z-index: 9999;
@@ -204,4 +203,129 @@ div.stButton > button:hover {
     text-align: left;
     top: 100px;
     right: 50px;
+}
+/* assets/app.css - стили приложения (вынесено из inline) */
+
+/* общий фон / слой позади контента */
+html, body, [class*="stApp"] {
+    background-color: black !important;
+    color: white;
+    position: relative;
+    z-index: 0;
+}
+
+.bg-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 0;
+}
+
+/* декоративные линиии/панели (раньше были inline div-ы) */
+.decor-line {
+    position: fixed;
+    background-color: rgb(255, 0, 85);
+    z-index: 1;
+}
+.decor-line.top      { height: 2px; width: 100%; top: 67px; right: 0; }
+.decor-line.right-tall{ width: 2px; height: 54%; top: 67px; right: 20px; }
+.decor-line.mid      { height: 2px; width: 36%; top: 150px; right: 0; }
+.decor-line.bottom   { height: 2px; width: 100%; top: 60.5%; right: 0; }
+.decor-line.right-mid{ width: 2px; height: 100%; top: 67px; right: 36%; }
+
+/* контейнер для дополнительных декоративных блоков */
+.bg-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* чтобы не мешать кликам по странице */
+    z-index: 0;
+}
+.bg-container .box1,
+.bg-container .box2,
+.bg-container .image {
+    pointer-events: none;
+}
+
+/* главный крупный заголовок и многослойный эффект GO */
+.main-title {
+    position: fixed;
+    font-size: 150px;
+    font-weight: 700;
+    color: rgb(255, 0, 85);
+    -webkit-text-stroke: 2px rgb(255, 0, 85);
+    text-align: center;
+    top: 200px;
+    left: 30px;
+    z-index: 2;
+}
+.main-1, .main-2, .main-3, .main-4 {
+    position: fixed;
+    font-size: 150px;
+    font-weight: 700;
+    color: transparent;
+    text-align: center;
+    top: 340px;
+    z-index: 2;
+}
+.main-1 { -webkit-text-stroke: 2px rgb(255, 0, 85); left: 100px; }
+.main-2 { -webkit-text-stroke: 2px rgb(182, 0, 61);  left: 350px; }
+.main-3 { -webkit-text-stroke: 2px rgb(107, 0, 36);   left: 600px; }
+.main-4 { -webkit-text-stroke: 2px rgb(41, 0, 14);    left: 850px; }
+
+/* about-us floating box */
+.about-box {
+    width: 600px;
+    height: 400px;
+    position: fixed;
+    top: 170px;
+    right: 20px;
+    font-weight: bold;
+    background-color: rgba(0,0,0,0.0);
+    color: rgb(255, 0, 85);
+    font-size: 30px;
+    padding: 15px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    text-align: right;
+    margin: 0;
+    z-index: 2;
+}
+
+/* кнопки/колонки — можно тонко настроить, если нужно */
+.top-buttons {
+    position: fixed;
+    top: 18px;
+    left: 20px;
+    z-index: 3;
+    display: flex;
+    gap: 8px;
+}
+
+/* responsive adjustments */
+@media (max-width: 900px) {
+    .main-title, .main-1, .main-2, .main-3, .main-4 {
+        font-size: 64px;
+        top: 120px;
+    }
+    .about-box {
+        width: calc(100% - 40px);
+        right: 20px;
+        left: 20px;
+        top: 220px;
+        font-size: 16px;
+        height: 220px;
+    }
+    .decor-line.right-tall,
+    .decor-line.right-mid { display: none; }
 }

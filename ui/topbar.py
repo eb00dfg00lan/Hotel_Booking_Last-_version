@@ -24,24 +24,6 @@ def render_header(goto, page: str | None = None):
     # Правый блок скрываем на спец-страницах и всегда, если пользователь авторизован
     hide_right = (page in HIDE_AUTH_ON_PAGES) or bool(user)
 
-    # --- CSS шапки
-    st.markdown(
-        """
-        <style>
-        .__topbar { position: sticky; top: 0; z-index: 999;
-            backdrop-filter: blur(6px);
-            border-bottom: 1px solid rgba(49,51,63,0.2);
-            padding: .25rem 0 .35rem 0;
-            background: rgba(255,255,255,0.65);
-        }
-        [data-theme="dark"] .__topbar { background: rgba(13,17,23,0.65); }
-        .__topbar .stButton>button { padding: .35rem .75rem; }
-        </style>
-        <div class="__topbar"></div>
-        """,
-        unsafe_allow_html=True,
-    )
-
     # --- Навигация для callback-ов (без st.rerun)
     def goto_cb(p: str):
         st.session_state["page"] = p  # callback -> rerun произойдёт автоматически
