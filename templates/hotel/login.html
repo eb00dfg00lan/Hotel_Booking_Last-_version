@@ -1,0 +1,16 @@
+{% extends 'hotel/base.html' %}
+{% block content %}
+<h1>Login</h1>
+<form method="post">{% csrf_token %}
+  <label>Username: <input name="username" required></label><br>
+  <label>Password: <input type="password" name="password"></label><br>
+  <label>Role:
+    <select name="role">
+      <option value="guest">guest</option>
+      <option value="partner">partner</option>
+      <option value="admin">admin</option>
+    </select>
+  </label><br>
+  <button type="submit">Login</button>
+</form>
+{% endblock %}

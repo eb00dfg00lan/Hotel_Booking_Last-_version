@@ -1,0 +1,22 @@
+<nav class="topbar">
+  <div class="left">
+    <a href="{% url 'hotel:welcome' %}">🏨 Home</a>
+    <a href="{% url 'hotel:search' %}">Search</a>
+    {% if request.session.role in ('partner', 'admin') %}
+      <a href="{% url 'hotel:booking_partner' %}">Partner bookings</a>
+      <a href="{% url 'hotel:my_hotels' %}">My hotels</a>
+    {% endif %}
+    {% if request.user.is_superuser %}
+      <a href="{% url 'hotel:admin_page' %}">Admin</a>
+    {% endif %}
+  </div>
+  <div class="right">
+    {% if request.user.is_authenticated %}
+      <span>Hello, {{ request.user.username }}</span>
+      <a href="{% url 'hotel:logout' %}">Logout</a>
+    {% else %}
+      <a href="{% url 'hotel:login' %}">Login</a>
+      <a href="{% url 'hotel:register' %}">Register</a>
+    {% endif %}
+  </div>
+</nav>

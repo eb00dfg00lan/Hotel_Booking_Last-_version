@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Hotel Booking{% endblock %}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'hotel/assets/app.css' %}">
+</head>
+<body>
+  {% include 'hotel/topbar.html' %}
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
