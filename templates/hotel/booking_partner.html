@@ -1,0 +1,9 @@
+{% extends 'hotel/base.html' %}
+{% block content %}
+<h1>Partner Bookings</h1>
+<ul>
+  {% for h in hotels %}
+    <li>{{ h.name }} — Rooms: {{ h.rooms.count }}</li>
+  {% empty %}<li>No hotels</li>{% endfor %}
+</ul>
+{% endblock %}

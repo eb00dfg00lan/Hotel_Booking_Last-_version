@@ -1,0 +1,10 @@
+{% extends 'hotel/base.html' %}
+{% block content %}
+<h1>My Hotels</h1>
+<ul>
+  {% for h in hotels %}
+    <li>{{ h.name }} — <a href="{% url 'hotel:add_hotel' %}">Edit</a></li>
+  {% empty %}<li>No hotels</li>{% endfor %}
+</ul>
+<a href="{% url 'hotel:add_hotel' %}">Add hotel</a>
+{% endblock %}

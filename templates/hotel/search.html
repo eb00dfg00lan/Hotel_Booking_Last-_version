@@ -1,0 +1,16 @@
+{% extends 'hotel/base.html' %}
+{% block content %}
+<h1>Search hotels</h1>
+<form method="get">
+  <input name="q" value="{{ request.GET.q }}">
+  <button>Search</button>
+</form>
+
+<ul>
+  {% for hotel in hotels %}
+    <li>{{ hotel.name }} — {{ hotel.address }}</li>
+  {% empty %}
+    <li>No hotels</li>
+  {% endfor %}
+</ul>
+{% endblock %}
