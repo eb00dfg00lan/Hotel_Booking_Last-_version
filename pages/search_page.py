@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 from datetime import date, timedelta
 from urllib.parse import urlencode
+from itertools import islice, chain
 
 import streamlit as st
 
@@ -115,9 +116,8 @@ def _load_calendar_data(
 
 # --- Рендер страницы ----------------------------------------------------------
 def render(goto):
-   
     st.title("Search Hotels")
-    #load_css("assets/app.css")
+    load_css("assets/app.css")
 
     # rows: id, name, city, price, rating, rooms, available, roomtype, rateplan, owner_id
     rows = fetch_hotels() or []
@@ -203,11 +203,18 @@ def render(goto):
         ),
     ]
 
-    filtered = filter_hotels(items, preds)
+    # Используем ленивый фильтр: получаем итератор
+    filtered_iter = filter_hotels(items, preds)
 
-    if not filtered:
+    # Peek: materialize максимум один элемент, чтобы корректно определить пустой результат,
+    # но не материализовать весь итератор.
+    first_chunk = list(islice(filtered_iter, 1))
+    if not first_chunk:
         st.info("No hotels found matching your criteria.")
         return
+
+    # Соединяем первый элемент обратно с остатком итератора, чтобы пройтись по всему набору лениво.
+    filtered = chain(first_chunk, filtered_iter)
 
     # --- Список результатов ---
     for h in filtered:
@@ -219,6 +226,7 @@ def render(goto):
             st.write(f"**Available Now:** {'✅ Yes' if h['available'] else '❌ No'}")
             if h.get("roomtype_list"):
                 st.write("**Room Types:** " + ", ".join(sorted(set(h["roomtype_list"]))))
+
             if h.get("rateplan_list"):
                 st.write("**More Services:** " + ", ".join(sorted(set(h["rateplan_list"]))))
 

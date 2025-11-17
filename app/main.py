@@ -15,7 +15,7 @@ def load_css(path="assets/app.css"):
 
 # --- app setup ---
 st.set_page_config(page_title="Hotel Booking System", page_icon="🏨", layout="wide")
-#load_css()
+load_css()
 init_db(); seed_database()
 
 # --- session defaults ---
@@ -42,7 +42,6 @@ def render_with_topbar(body_fn):
 def partner_guarded(goto):
     require_roles("partner", "admin")
     booking_partner_page.render(goto)
-
     my_hotels_page.render(goto)
 
 

@@ -17,7 +17,8 @@ DB_PATH = Path("Data/hotel_booking.db")
 
 def get_connection():
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
+    # Преобразуем Path в str — безопаснее для sqlite3 в разных окружениях
+    conn = sqlite3.connect(str(DB_PATH))
     # Полезно, чтобы получать dict-подобные результаты при желании
     conn.row_factory = sqlite3.Row
     return conn
