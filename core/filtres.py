@@ -1,6 +1,4 @@
-# core/filtres.py
 from typing import Any, Callable, Iterable, Iterator, Sequence, Dict, List
-# Если у тебя Python >=3.9, можно использовать dict[str,int] и list[str], но для совместимости я использую typing.
 
 Predicate = Callable[[Any], bool]
 
@@ -25,19 +23,12 @@ def make_stars_filter(min_stars: int) -> Predicate:
                 rating = float(_get(h, "rating", 0.0))
             except (TypeError, ValueError):
                 rating = 0.0
-            # округление к ближайшему, затем ограничение 1..5
             stars = max(1, min(5, int(round(rating))))
         return int(stars) >= int(min_stars)
     return _ok
 
 def filter_hotels(items: Iterable[Any], preds: Sequence[Predicate]) -> Iterator[Any]:
-    """
-    Лениво фильтрует items через все предикаты.
-    Возвращает генератор (итератор), не список.
-    Используй list(filter_hotels(...)) только на финальном шаге.
-    """
     if not preds:
-        # просто итератор по items
         for h in items:
             yield h
         return
@@ -52,11 +43,7 @@ def filter_hotels(items: Iterable[Any], preds: Sequence[Predicate]) -> Iterator[
             yield h
 
 def _make_roomtype_filter(demand: Dict[str, int]):
-    """
-    demand: { "Стандарт": N, "VIP делюкс": M, ... }
-    Оставляем отели, у которых count >= N для каждого выбранного (N>0) типа.
-    """
-    # очищаем нули
+
     demand = {k: int(v) for k, v in (demand or {}).items() if int(v) > 0}
 
     def pred(h: dict) -> bool:
@@ -73,10 +60,7 @@ def _make_roomtype_filter(demand: Dict[str, int]):
 
 
 def _make_rateplan_filter(required_keys: List[str]):
-    """
-    required_keys: список ключей из JSON rateplan (breakfast, spa, ...),
-    которые пользователь отметил. Все должны быть has=True.
-    """
+
     required_keys = [k for k in (required_keys or []) if k]
 
     def pred(h: dict) -> bool:

@@ -64,16 +64,22 @@ def _norm(s: str) -> str:
 
 
 def _make_name_presence_filter(list_key: str, selected: list[str], require_all: bool):
-    """Фильтр по наличию имён (нормализованных) в поле списка (roomtype_list/rateplan_list)."""
-    pats = [_norm(x) for x in (selected or []) if x and x.strip()]
+    """Фильтр по наличию имён (нормализованных) в поле списка (roomtype_list/rateplan_list).
+    Реализовано через множества нормализованных токенов: для All — подмножество, для Any — пересечение.
+    """
+    pats = {_norm(x) for x in (selected or []) if x and str(x).strip()}
 
     def pred(h: dict) -> bool:
         if not pats:
             return True
-        vals = [_norm(x) for x in h.get(list_key, [])]
+        vals_raw = h.get(list_key, []) or []
+        vals = {_norm(x) for x in vals_raw if x and str(x).strip()}
+        if not vals:
+            return False
         if require_all:
-            return all(any(p == v or p in v for v in vals) for p in pats)
-        return any(any(p == v or p in v for v in vals) for p in pats)
+            return pats.issubset(vals)
+        else:
+            return bool(pats & vals)
 
     return pred
 
@@ -126,6 +132,9 @@ def render(goto):
     st.markdown('<div class="filters-header">⚙️ Filters</div>', unsafe_allow_html=True)
     cities = sorted({str(r[2]) for r in rows if r[2]}) if rows else []
     city = st.selectbox("🏙️ City", ["All"] + cities)
+    
+    if city == "All":
+        city = None
 
     max_price_in_data = max((int(r[3]) for r in rows if r[3] is not None), default=100000)
     slider_max = max(10000, ((max_price_in_data // 10000) + 1) * 10000)
@@ -142,24 +151,26 @@ def render(goto):
     with st.expander("Room Types", expanded=True):
         col1, col2, col3 = st.columns(3)
         with col1:
-            rt_std       = st.checkbox("Standard", key="rt_std")
-            rt_std_plus  = st.checkbox("Standard Plus", key="rt_std_plus")
+            rt_std = st.checkbox("Standard", key="rt_std")
+            rt_std_plus = st.checkbox("Standard Plus", key="rt_std_plus")
         with col2:
             rt_std_delux = st.checkbox("Standard Deluxe", key="rt_std_delux")
-            rt_vip_std   = st.checkbox("VIP Standard", key="rt_vip_std")
+            rt_vip_std = st.checkbox("VIP Standard", key="rt_vip_std")
         with col3:
-            rt_vip_plus  = st.checkbox("VIP Plus", key="rt_vip_plus")
+            rt_vip_plus = st.checkbox("VIP Plus", key="rt_vip_plus")
             rt_vip_delux = st.checkbox("VIP Deluxe", key="rt_vip_delux")
         rt_mode = st.radio("Room Type Match", ["Any", "All"], horizontal=True, key="rt_mode")
         selected_roomtypes = [
-            name for flag, name in [
+            name
+            for flag, name in [
                 (rt_std, "Standard"),
                 (rt_std_plus, "Standard Plus"),
                 (rt_std_delux, "Standard Deluxe"),
                 (rt_vip_std, "VIP Standard"),
                 (rt_vip_plus, "VIP Plus"),
                 (rt_vip_delux, "VIP Deluxe"),
-            ] if flag
+            ]
+            if flag
         ]
 
     # Доп-услуги (rateplan)
