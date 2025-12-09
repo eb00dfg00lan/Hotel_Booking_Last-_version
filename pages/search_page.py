@@ -1,5 +1,7 @@
 # pages/search_page.py
 import json
+import time
+import asyncio
 from pathlib import Path
 from datetime import date, timedelta
 from urllib.parse import urlencode
@@ -24,7 +26,78 @@ from tools.db import (
     fetch_rules_for_rate,
 )
 
-# --- Константы UI -------------------------------------------------------------
+
+class EventBus:
+    def __init__(self, delay=0.5):
+        self.subscribers = {}
+        self.delay = delay
+
+    def subscribe(self, event_name, handler):
+        if event_name not in self.subscribers:
+            self.subscribers[event_name] = []
+        self.subscribers[event_name].append(handler)
+
+    def emit(self, event_name, data=None):
+        time.sleep(self.delay)
+        if event_name in self.subscribers:
+            for handler in self.subscribers[event_name]:
+                handler(data)
+
+bus = EventBus(delay=0.5)
+
+
+def notify_user(msg):
+    st.info(msg)
+
+
+def multiply(a, b):
+    return a * b
+
+def add(a, b):
+    return a + b
+
+class UserAnalyticsService:
+    def __init__(self, multiply_func, add_func):
+        self.multiply = multiply_func
+        self.add = add_func
+
+    def compute_score(self, name_len, user_id):
+        return self.add(self.multiply(name_len, user_id), name_len)
+
+def user_analytics_factory():
+    return UserAnalyticsService(multiply, add)
+
+
+def on_user_registered_lab7(user_data):
+    username = user_data["name"]
+    user_id = user_data["id"]
+    service = user_analytics_factory()
+    score = service.compute_score(len(username), user_id)
+    notify_user(f"{username} успешно зарегистрирован! ID:{user_id} | Активность:{score}")
+
+
+async def load_data(i):
+    await asyncio.sleep(0.1) 
+    return f"data_{i}"
+
+async def process_data(data):
+    await asyncio.sleep(0.1) 
+    return data.upper()
+
+async def run_lab8_pipeline(username):
+    raw_data = await asyncio.gather(*(load_data(i) for i in range(3)))
+    processed = await asyncio.gather(*(process_data(d) for d in raw_data))
+    notify_user(f"{username} Lab8 pipeline done: {processed}")
+
+def on_user_registered_lab8(user_data):
+    username = user_data["name"]
+    asyncio.create_task(run_lab8_pipeline(username))
+
+
+bus.subscribe("user_registered", on_user_registered_lab7)
+bus.subscribe("user_registered", on_user_registered_lab8)
+
+
 ROOMTYPE_FIXED = [
     "Standard",
     "Standard Plus",
@@ -213,18 +286,12 @@ def render(goto):
             "rateplan_list", selected_extras, require_all=(rp_mode == "All")
         ),
     ]
-
-    # Используем ленивый фильтр: получаем итератор
     filtered_iter = filter_hotels(items, preds)
-
-    # Peek: materialize максимум один элемент, чтобы корректно определить пустой результат,
-    # но не материализовать весь итератор.
     first_chunk = list(islice(filtered_iter, 1))
     if not first_chunk:
         st.info("No hotels found matching your criteria.")
         return
 
-    # Соединяем первый элемент обратно с остатком итератора, чтобы пройтись по всему набору лениво.
     filtered = chain(first_chunk, filtered_iter)
 
     # --- Список результатов ---
@@ -245,8 +312,10 @@ def render(goto):
                 if not st.session_state.get("user"):
                     st.error("Please log in first.")
                 else:
+
                     st.session_state.selected_hotel_id = h["id"]
                     goto("booking")  # маршрут в нижнем регистре
+                    bus.subscribe("user_registered", registration_success_message)
 
             # --- Календарь цен для этого отеля ---
             with st.expander("📅 Show price calendar", expanded=False):

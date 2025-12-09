@@ -8,6 +8,35 @@ from pages import (
 from pathlib import Path
 from core.guards import require_roles
 
+import time
+
+class EventBus:
+    def __init__(self, delay=0.5):
+        self.subscribers = {}
+        self.delay = delay
+
+    def subscribe(self, event_name, handler):
+        if event_name not in self.subscribers:
+            self.subscribers[event_name] = []
+        self.subscribers[event_name].append(handler)
+
+    def emit(self, event_name, data=None):
+        time.sleep(self.delay)      # ⬅ задержка 0.5 сек
+        if event_name in self.subscribers:
+            for handler in self.subscribers[event_name]:
+                handler(data)
+
+def notify_user(msg):
+    st.info(msg)
+
+def delayed_call(delay=0.5):
+    def wrapper(func):
+        def inner(*args, **kwargs):
+            time.sleep(delay)
+            return func(*args, **kwargs)
+        return inner
+    return wrapper
+
 # --- utils ---
 def load_css(path="assets/app.css"):
     css = Path(path).read_text(encoding="utf-8")
